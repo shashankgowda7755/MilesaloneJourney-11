@@ -258,11 +258,17 @@ export default function DestinationDetail() {
 
             {/* Enhanced Map Component */}
             <DestinationMap destination={destination} />
+            
+            {/* Extra spacing after map to prevent navigation overlap */}
+            <div className="h-24"></div>
           </div>
         </div>
 
         {/* Related Content */}
         <RelatedContent destination={destination} />
+        
+        {/* Additional spacing after photos/content */}
+        <div className="h-16"></div>
 
         {/* Back to Journey */}
         <div className="mt-12 pt-8 border-t border-gray-200 text-center" data-testid="back-to-journey-section">
