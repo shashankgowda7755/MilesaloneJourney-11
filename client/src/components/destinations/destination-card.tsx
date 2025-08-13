@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, Calendar, Clock, MapPin } from "lucide-react";
+import { Star, Calendar, Clock, MapPin, Images, Navigation } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,18 @@ export default function DestinationCard({ destination }: DestinationCardProps) {
 
   const handleViewDetails = () => {
     setIsDialogOpen(true);
+  };
+
+  const handleOpenMap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const { lat, lng } = destination.coordinates;
+    window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+  };
+
+  const handleViewGallery = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Navigate to gallery page or show gallery for this destination
+    window.open('/gallery', '_blank');
   };
 
   return (
@@ -101,16 +113,40 @@ export default function DestinationCard({ destination }: DestinationCardProps) {
             ))}
           </div>
           
-          <Button 
-            className="w-full bg-brand-orange text-white hover:bg-brand-orange/90"
-            data-testid="destination-card-view-guide"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleViewDetails();
-            }}
-          >
-            View Destination Guide
-          </Button>
+          <div className="grid grid-cols-3 gap-2">
+            <Button 
+              className="bg-brand-orange text-white hover:bg-brand-orange/90"
+              size="sm"
+              data-testid="destination-card-view-guide"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewDetails();
+              }}
+            >
+              <MapPin className="w-4 h-4 mr-1" />
+              Guide
+            </Button>
+            <Button 
+              variant="outline"
+              size="sm"
+              className="border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white"
+              data-testid="destination-card-open-map"
+              onClick={handleOpenMap}
+            >
+              <Navigation className="w-4 h-4 mr-1" />
+              Map
+            </Button>
+            <Button 
+              variant="outline"
+              size="sm"
+              className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+              data-testid="destination-card-view-gallery"
+              onClick={handleViewGallery}
+            >
+              <Images className="w-4 h-4 mr-1" />
+              Photos
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

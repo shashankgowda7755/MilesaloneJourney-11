@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Calendar, Route, Coins, ChevronDown, Mail, BookOpen } from "lucide-react";
+import { MapPin, Calendar, Route, Coins, ChevronDown, Mail, BookOpen, Images, Navigation } from "lucide-react";
 import InteractiveMap from "@/components/journey/interactive-map";
 import BlogCard from "@/components/blog/blog-card";
 import NewsletterForm from "@/components/newsletter/newsletter-form";
@@ -20,6 +20,14 @@ export default function Home() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleOpenFullMap = () => {
+    window.open('https://www.google.com/maps/search/india+travel+journey', '_blank');
+  };
+
+  const handleViewAllGalleries = () => {
+    window.open('/gallery', '_blank');
   };
 
   return (
@@ -135,6 +143,27 @@ export default function Home() {
             </div>
             
             <InteractiveMap height="500px" />
+            
+            {/* Map and Gallery Actions */}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button 
+                onClick={handleOpenFullMap}
+                className="bg-brand-orange text-white hover:bg-brand-orange/90"
+                data-testid="home-open-full-map"
+              >
+                <Navigation className="w-4 h-4 mr-2" />
+                Open Full Journey Map
+              </Button>
+              <Button 
+                onClick={handleViewAllGalleries}
+                variant="outline"
+                className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+                data-testid="home-view-all-galleries"
+              >
+                <Images className="w-4 h-4 mr-2" />
+                View Photo Galleries
+              </Button>
+            </div>
           </div>
           
           {/* Journey Progress Cards */}

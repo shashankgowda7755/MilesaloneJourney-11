@@ -1,7 +1,8 @@
 import { Link } from "wouter";
-import { Clock, Calendar } from "lucide-react";
+import { Clock, Calendar, Images, Navigation, MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { BlogPost } from "@shared/schema";
 
 interface BlogCardProps {
@@ -23,6 +24,20 @@ export default function BlogCard({ post }: BlogCardProps) {
       day: 'numeric', 
       year: 'numeric' 
     }).format(new Date(date));
+  };
+
+  const handleOpenMap = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Open a general map or location based on post content
+    window.open('https://www.google.com/maps/search/india+travel+destinations', '_blank');
+  };
+
+  const handleViewGallery = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Navigate to gallery page
+    window.open('/gallery', '_blank');
   };
 
   return (
@@ -64,11 +79,37 @@ export default function BlogCard({ post }: BlogCardProps) {
           </div>
         </div>
         
-        <Link href={`/letters/${post.slug}`} className="mt-4 block">
-          <div className="w-full bg-brand-orange text-white py-2 px-4 rounded-lg text-center font-medium hover:bg-brand-orange/90 transition-colors" data-testid="blog-card-read-more">
-            Read More
+        <div className="mt-4 space-y-2">
+          <Link href={`/letters/${post.slug}`} className="block">
+            <div className="w-full bg-brand-orange text-white py-2 px-4 rounded-lg text-center font-medium hover:bg-brand-orange/90 transition-colors" data-testid="blog-card-read-more">
+              <MapPin className="w-4 h-4 inline mr-2" />
+              Read Story
+            </div>
+          </Link>
+          
+          <div className="grid grid-cols-2 gap-2">
+            <Button 
+              variant="outline"
+              size="sm"
+              className="border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white"
+              data-testid="blog-card-open-map"
+              onClick={handleOpenMap}
+            >
+              <Navigation className="w-4 h-4 mr-1" />
+              Map
+            </Button>
+            <Button 
+              variant="outline"
+              size="sm"
+              className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+              data-testid="blog-card-view-gallery"
+              onClick={handleViewGallery}
+            >
+              <Images className="w-4 h-4 mr-1" />
+              Photos
+            </Button>
           </div>
-        </Link>
+        </div>
       </CardContent>
     </Card>
   );
