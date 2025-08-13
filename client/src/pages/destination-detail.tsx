@@ -267,17 +267,20 @@ export default function DestinationDetail() {
         {/* Back to Journey */}
         <div className="mt-12 pt-8 border-t border-gray-200 text-center" data-testid="back-to-journey-section">
           <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-6">
-            Continue Exploring
+            Want to See Maps & More Destinations?
           </h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            Return to the Journey section to explore interactive maps, discover other destinations, and continue your travel planning.
+          </p>
           <Link href="/journey">
-            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90">
-              Explore More Destinations
+            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium" data-testid="explore-more-button">
+              Explore More
             </Button>
           </Link>
         </div>
         
-        {/* Bottom spacer to prevent navigation overlap */}
-        <div className="h-24"></div>
+        {/* Extra bottom spacer (0.5cm ≈ 48px) to prevent navigation overlap */}
+        <div className="h-36"></div>
       </div>
     </div>
   );
