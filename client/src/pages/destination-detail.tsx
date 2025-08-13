@@ -258,16 +258,13 @@ export default function DestinationDetail() {
 
             {/* Enhanced Map Component */}
             <DestinationMap destination={destination} />
-            
-            {/* Extra spacing after map to prevent navigation overlap */}
-            <div className="h-24"></div>
           </div>
         </div>
 
         {/* Related Content */}
         <RelatedContent destination={destination} />
         
-        {/* Extra large spacing (1500px) after "Open in Maps" and "View Gallery" buttons */}
+        {/* Extra large spacing (1500px) after maps and any gallery/content */}
         <div style={{ height: '1500px' }}></div>
 
         {/* Explore More Section */}
