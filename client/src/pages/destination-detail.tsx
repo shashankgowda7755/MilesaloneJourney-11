@@ -266,17 +266,20 @@ export default function DestinationDetail() {
           <RelatedContent destination={destination} />
         </div>
         
-        {/* Explore More Section - positioned after maps and photos */}
-        <div className="mt-12 pt-8 border-t border-gray-200" data-testid="explore-more-section">
-          <div className="text-center py-8 mb-32">
+        {/* Explore More Section - ALWAYS show after maps and photos */}
+        <div className="mt-16 pt-8 border-t border-gray-200 bg-white" data-testid="explore-more-section">
+          <div className="text-center py-12 mb-24">
             <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-4">
               Continue Exploring
             </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
               Dive deeper into more destinations and experiences from the Kashmir to Kanyakumari journey
             </p>
             <Link href="/journey">
-              <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all" data-testid="explore-more-button">
+              <Button 
+                className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-4 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105" 
+                data-testid="explore-more-button"
+              >
                 <Navigation className="mr-2 h-5 w-5" />
                 Explore More Destinations
               </Button>
