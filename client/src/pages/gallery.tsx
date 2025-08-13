@@ -16,6 +16,9 @@ export default function Gallery() {
 
         {/* Gallery Collections */}
         <GalleryGrid />
+        
+        {/* Bottom spacer to prevent navigation overlap */}
+        <div className="h-24"></div>
       </div>
     </div>
   );

@@ -81,6 +81,11 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+  
+  html {
+    scroll-behavior: smooth; /* Smooth scrolling for better navigation */
   }
 
   h1, h2, h3, h4, h5, h6 {

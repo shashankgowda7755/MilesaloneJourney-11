@@ -205,6 +205,9 @@ export default function About() {
             </Card>
           </div>
         </section>
+        
+        {/* Bottom spacer to prevent navigation overlap */}
+        <div className="h-24"></div>
       </div>
     </div>
   );

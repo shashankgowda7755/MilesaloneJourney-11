@@ -191,6 +191,9 @@ export default function BlogPost() {
             </Link>
           </div>
         </div>
+        
+        {/* Bottom spacer to prevent navigation overlap */}
+        <div className="h-24"></div>
       </div>
     </div>
   );

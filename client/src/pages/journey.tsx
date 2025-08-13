@@ -85,6 +85,9 @@ export default function Journey() {
 
           <DestinationGrid />
         </div>
+        
+        {/* Bottom spacer to prevent navigation overlap */}
+        <div className="h-24"></div>
       </div>
     </div>
   );

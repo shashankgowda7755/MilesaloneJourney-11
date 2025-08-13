@@ -16,6 +16,9 @@ export default function Letters() {
 
         {/* Blog Grid with Search and Filters */}
         <BlogGrid />
+        
+        {/* Bottom spacer to prevent navigation overlap */}
+        <div className="h-24"></div>
       </div>
     </div>
   );

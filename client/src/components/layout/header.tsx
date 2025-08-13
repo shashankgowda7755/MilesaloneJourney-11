@@ -26,7 +26,7 @@ export default function Header() {
   return (
     <>
       {/* Desktop Header */}
-      <header className="hidden lg:block bg-white shadow-sm sticky top-0 z-40" data-testid="desktop-header">
+      <header className="hidden lg:block bg-white shadow-sm sticky top-0 z-50" data-testid="desktop-header">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <nav className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2" data-testid="logo-desktop">
@@ -39,7 +39,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`transition-colors font-medium ${
+                  className={`transition-all duration-300 font-medium transform hover:scale-105 ${
                     isActive(item.href)
                       ? "text-brand-orange"
                       : "text-brand-brown hover:text-brand-orange"
@@ -60,7 +60,7 @@ export default function Header() {
       </header>
 
       {/* Mobile Header */}
-      <header className="lg:hidden bg-white shadow-sm sticky top-0 z-40" data-testid="mobile-header">
+      <header className="lg:hidden bg-white shadow-sm sticky top-0 z-50" data-testid="mobile-header">
         <div className="flex items-center justify-between p-4">
           <Link href="/" className="flex items-center space-x-2" data-testid="logo-mobile">
             <Mountain className="text-brand-orange text-xl" />

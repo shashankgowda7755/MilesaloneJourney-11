@@ -275,6 +275,9 @@ export default function DestinationDetail() {
             </Button>
           </Link>
         </div>
+        
+        {/* Bottom spacer to prevent navigation overlap */}
+        <div className="h-24"></div>
       </div>
     </div>
   );
