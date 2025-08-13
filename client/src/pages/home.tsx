@@ -365,7 +365,12 @@ export default function Home() {
           {customSelectedGallery.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12" data-testid="gallery-grid">
               {customSelectedGallery.map((collection) => (
-                <Card key={collection.id} className="overflow-hidden shadow-lg card-hover bg-white" data-testid={`gallery-collection-${collection.id}`}>
+                <Card 
+                  key={collection.id} 
+                  className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer" 
+                  data-testid={`gallery-collection-${collection.id}`}
+                  onClick={() => window.open('/gallery', '_blank')}
+                >
                   <div className="relative h-64">
                     <img
                       src={collection.coverImage}
@@ -386,6 +391,10 @@ export default function Home() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open('/gallery', '_blank');
+                        }}
                         className="bg-white bg-opacity-20 backdrop-blur-sm text-white hover:bg-white hover:bg-opacity-30"
                         data-testid="collection-expand-button"
                       >
@@ -406,6 +415,10 @@ export default function Home() {
                       <Button 
                         size="sm"
                         variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open('/gallery', '_blank');
+                        }}
                         className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
                         data-testid={`collection-view-button-${collection.id}`}
                       >

@@ -46,8 +46,9 @@ export default function GalleryGrid() {
           {collections.map((collection) => (
             <Card 
               key={collection.id} 
-              className="overflow-hidden shadow-lg card-hover bg-white"
+              className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer"
               data-testid={`gallery-collection-${collection.id}`}
+              onClick={() => openLightbox(collection)}
             >
               <div className="relative h-64">
                 <img
@@ -69,7 +70,10 @@ export default function GalleryGrid() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => openLightbox(collection)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openLightbox(collection);
+                    }}
                     className="bg-white bg-opacity-20 backdrop-blur-sm text-white hover:bg-white hover:bg-opacity-30"
                     data-testid="collection-expand-button"
                   >
@@ -89,7 +93,10 @@ export default function GalleryGrid() {
                     <div
                       key={media.id}
                       className="relative w-20 h-12 flex-shrink-0 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                      onClick={() => openLightbox(collection, index)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openLightbox(collection, index);
+                      }}
                       data-testid={`thumbnail-${index}`}
                     >
                       <img
@@ -107,7 +114,10 @@ export default function GalleryGrid() {
                 </div>
                 
                 <Button
-                  onClick={() => openLightbox(collection)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openLightbox(collection);
+                  }}
                   className="w-full bg-brand-orange text-white hover:bg-brand-orange/90"
                   data-testid="view-collection-button"
                 >
