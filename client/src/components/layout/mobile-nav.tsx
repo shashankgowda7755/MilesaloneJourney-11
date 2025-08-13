@@ -20,7 +20,7 @@ export default function MobileNav() {
   };
 
   return (
-    <nav className="mobile-bottom-nav lg:hidden" data-testid="mobile-bottom-nav">
+    <nav className="mobile-bottom-nav lg:hidden mt-[-12px] mb-[-12px]" data-testid="mobile-bottom-nav">
       <div className="flex justify-around items-center h-16">
         {navigation.map((item) => {
           const Icon = item.icon;
