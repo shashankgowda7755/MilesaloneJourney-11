@@ -1,9 +1,8 @@
 import { useLocation } from "wouter";
 import { Home, Map, BookOpen, Images, User } from "lucide-react";
-import { Link } from "wouter";
 
 export default function MobileNav() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
 
   const navigation = [
     { name: "Home", href: "/", icon: Home },
@@ -28,19 +27,21 @@ export default function MobileNav() {
           const active = isActive(item.href);
           
           return (
-            <Link
+            <button
               key={item.name}
-              href={item.href}
-              className={`flex flex-col items-center space-y-1 px-2 py-1 transition-all ${
+              className={`flex flex-col items-center space-y-1 px-2 py-1 transition-all cursor-pointer relative ${
                 active 
                   ? "mobile-nav-active text-white" 
                   : "text-gray-600 hover:text-brand-orange"
               }`}
               data-testid={`mobile-nav-${item.name.toLowerCase()}`}
+              onClick={() => {
+                navigate(item.href);
+              }}
             >
               <Icon className="h-5 w-5" />
               <span className="text-xs">{item.name}</span>
-            </Link>
+            </button>
           );
         })}
       </div>
