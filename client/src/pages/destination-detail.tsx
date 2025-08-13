@@ -5,6 +5,8 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DestinationMap from "@/components/destinations/destination-map";
+import RelatedContent from "@/components/destinations/related-content";
 import { Destination } from "@shared/schema";
 
 export default function DestinationDetail() {
@@ -84,8 +86,8 @@ export default function DestinationDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream py-16 lg:py-24" data-testid="destination-page">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className="min-h-screen bg-brand-cream py-16 lg:py-24 destination-detail-page" data-testid="destination-page">
+      <div className="max-w-6xl mx-auto px-6 page-content">
         {/* Navigation */}
         <div className="mb-8">
           <Link href="/journey">
@@ -254,40 +256,13 @@ export default function DestinationDetail() {
               </CardContent>
             </Card>
 
-            {/* Map */}
-            <Card data-testid="destination-location">
-              <CardHeader>
-                <CardTitle className="font-playfair text-xl text-brand-brown flex items-center">
-                  <Navigation className="mr-2 h-5 w-5" />
-                  Location
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center text-gray-500">
-                  <div className="text-center">
-                    <MapPin className="h-8 w-8 mx-auto mb-2" />
-                    <div className="text-sm">
-                      {destination.coordinates.lat.toFixed(4)}, {destination.coordinates.lng.toFixed(4)}
-                    </div>
-                  </div>
-                </div>
-                <Button 
-                  className="w-full bg-brand-orange text-white hover:bg-brand-orange/90"
-                  onClick={() => {
-                    window.open(
-                      `https://www.google.com/maps?q=${destination.coordinates.lat},${destination.coordinates.lng}`,
-                      '_blank'
-                    );
-                  }}
-                  data-testid="open-maps-button"
-                >
-                  <Navigation className="mr-2 h-4 w-4" />
-                  Open in Maps
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Enhanced Map Component */}
+            <DestinationMap destination={destination} />
           </div>
         </div>
+
+        {/* Related Content */}
+        <RelatedContent destination={destination} />
 
         {/* Back to Journey */}
         <div className="mt-12 pt-8 border-t border-gray-200 text-center" data-testid="back-to-journey-section">

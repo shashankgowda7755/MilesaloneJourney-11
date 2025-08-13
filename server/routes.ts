@@ -47,6 +47,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/blog-posts/by-id/:id", async (req, res) => {
+    try {
+      const post = await storage.getBlogPostById(req.params.id);
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      console.error("Error fetching blog post by ID:", error);
+      res.status(500).json({ message: "Failed to fetch blog post by ID" });
+    }
+  });
+
   app.post("/api/blog-posts", async (req, res) => {
     try {
       const validatedData = insertBlogPostSchema.parse(req.body);

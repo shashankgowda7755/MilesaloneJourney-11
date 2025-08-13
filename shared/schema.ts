@@ -46,6 +46,8 @@ export const destinations = pgTable("destinations", {
   activities: jsonb("activities").$type<string[]>().notNull().default([]),
   rating: integer("rating").notNull().default(5),
   difficulty: text("difficulty").notNull(), // Easy, Moderate, Challenging
+  relatedGalleryId: varchar("related_gallery_id").references(() => galleryCollections.id),
+  relatedBlogPosts: jsonb("related_blog_posts").$type<string[]>().notNull().default([]), // Array of blog post IDs
   isCurrentLocation: boolean("is_current_location").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),

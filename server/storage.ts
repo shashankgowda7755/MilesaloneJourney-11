@@ -28,6 +28,7 @@ export interface IStorage {
   // Blog Posts
   getBlogPosts(category?: string): Promise<BlogPost[]>;
   getBlogPost(slug: string): Promise<BlogPost | undefined>;
+  getBlogPostById(id: string): Promise<BlogPost | undefined>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: string, post: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
   deleteBlogPost(id: string): Promise<boolean>;
@@ -95,7 +96,7 @@ export class MemStorage implements IStorage {
         name: "Srinagar, Kashmir",
         slug: "srinagar-kashmir",
         description: "The Venice of the East with its famous Dal Lake, floating gardens, and houseboat experiences.",
-        detailedDescription: "Srinagar, the summer capital of Jammu and Kashmir, is renowned for its natural beauty, gardens, waterfronts and houseboats. The city lies on the banks of the Jhelum River, a tributary of the Indus, and Dal and Anchar lakes.",
+        detailedDescription: "Srinagar, the summer capital of Jammu and Kashmir, is renowned for its natural beauty, gardens, waterfronts and houseboats. The city lies on the banks of the Jhelum River, a tributary of the Indus, and Dal and Anchar lakes. Experience the magical floating markets, stay in traditional houseboats, and explore centuries-old Mughal gardens that showcase the region's rich heritage.",
         category: "Mountain Destination",
         region: "North India",
         state: "Jammu & Kashmir",
@@ -108,6 +109,8 @@ export class MemStorage implements IStorage {
         activities: ["Boating", "Trekking", "Photography", "Cultural Tours"],
         rating: 49,
         difficulty: "Easy",
+        relatedGalleryId: null, // Will be populated with actual gallery ID
+        relatedBlogPosts: [], // Will be populated with blog post IDs
         isCurrentLocation: false,
         isFeatured: true,
       },
@@ -213,6 +216,35 @@ export class MemStorage implements IStorage {
       },
     ];
 
+    // First create sample gallery collections
+    const galleryData = [
+      {
+        id: randomUUID(),
+        title: "Kashmir's Floating Gardens",
+        description: "A visual journey through Dal Lake's famous floating gardens and traditional houseboats",
+        coverImage: "https://images.unsplash.com/photo-1571018621578-de0c7d7c60ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        mediaCount: 15,
+        location: "Srinagar, Kashmir",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: randomUUID(),
+        title: "Royal Rajasthan",
+        description: "Capturing the architectural marvels and vibrant culture of Jaipur's palaces and markets",
+        coverImage: "https://images.unsplash.com/photo-1583395496271-c7dbe8cb18ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        mediaCount: 12,
+        location: "Jaipur, Rajasthan",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    ];
+
+    // Store galleries  
+    galleryData.forEach(gallery => {
+      this.galleryCollections.set(gallery.id, gallery);
+    });
+
     destinationsData.forEach(dest => {
       const destination: Destination = {
         ...dest,
@@ -222,6 +254,10 @@ export class MemStorage implements IStorage {
         rating: dest.rating ?? 30,
         isFeatured: dest.isFeatured ?? false,
         isCurrentLocation: dest.isCurrentLocation ?? false,
+        // Connect destinations with galleries
+        relatedGalleryId: dest.slug === 'srinagar-kashmir' ? galleryData[0].id : 
+                          dest.slug === 'jaipur-rajasthan' ? galleryData[1].id : null,
+        relatedBlogPosts: dest.relatedBlogPosts ?? [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -376,6 +412,8 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
       },
     ];
 
+    // Create blog posts and store their IDs for connecting to destinations
+    const createdBlogPosts: string[] = [];
     blogPostsData.forEach(post => {
       const blogPost: BlogPost = {
         ...post,
@@ -387,6 +425,17 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
         updatedAt: new Date(),
       };
       this.blogPosts.set(blogPost.id, blogPost);
+      createdBlogPosts.push(blogPost.id);
+    });
+
+    // Update destinations with blog post connections
+    const destinationList = Array.from(this.destinations.values());
+    destinationList.forEach((destination) => {
+      if (destination.slug === 'srinagar-kashmir' && createdBlogPosts[0]) {
+        destination.relatedBlogPosts = [createdBlogPosts[0]]; // Kashmir blog post
+      } else if (destination.slug === 'jaipur-rajasthan' && createdBlogPosts.length > 5) {
+        destination.relatedBlogPosts = [createdBlogPosts[5]]; // Pink City post
+      }
     });
 
     // Initialize gallery collections
@@ -472,6 +521,10 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
 
   async getBlogPost(slug: string): Promise<BlogPost | undefined> {
     return Array.from(this.blogPosts.values()).find(post => post.slug === slug);
+  }
+
+  async getBlogPostById(id: string): Promise<BlogPost | undefined> {
+    return this.blogPosts.get(id);
   }
 
   async createBlogPost(insertPost: InsertBlogPost): Promise<BlogPost> {
