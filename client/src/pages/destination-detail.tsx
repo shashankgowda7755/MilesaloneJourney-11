@@ -267,8 +267,8 @@ export default function DestinationDetail() {
         {/* Related Content */}
         <RelatedContent destination={destination} />
         
-        {/* Large spacing (500px) after photos/content */}
-        <div style={{ height: '500px' }}></div>
+        {/* Large spacing (1000px) after "Open in Maps" and "View Gallery" buttons */}
+        <div style={{ height: '1000px' }}></div>
 
         {/* Explore More Section */}
         <div className="text-center" data-testid="explore-more-section">
@@ -279,8 +279,8 @@ export default function DestinationDetail() {
           </Link>
         </div>
         
-        {/* Extra bottom spacer (0.5cm ≈ 48px) to prevent navigation overlap */}
-        <div className="h-36"></div>
+        {/* Large bottom spacing (1000px) after Explore More button */}
+        <div style={{ height: '1000px' }}></div>
       </div>
     </div>
   );
