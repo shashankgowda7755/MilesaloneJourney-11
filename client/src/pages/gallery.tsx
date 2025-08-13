@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import GalleryGrid from "@/components/gallery/gallery-grid";
 import Lightbox from "@/components/gallery/lightbox";
+import YouTubePlayer from "@/components/gallery/youtube-player";
 import { useState } from "react";
 import type { GalleryCollectionWithMedia } from "@shared/schema";
 
@@ -157,29 +158,55 @@ export default function Gallery() {
           </div>
         </div>
 
-        {/* Simple Gallery Layout */}
+        {/* Collection Description */}
         <div className="mb-8 text-center">
           <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
             {collection.description}
           </p>
         </div>
 
-        {/* Photo Grid - Simple Layout */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-16" data-testid="photo-grid">
-          {collection.media.map((media, index) => (
-            <div
-              key={media.id}
-              className="aspect-square cursor-pointer overflow-hidden rounded-lg card-hover"
-              onClick={() => openLightbox(index)}
-              data-testid={`photo-${index}`}
-            >
-              <img
-                src={media.url}
-                alt={media.caption || `Photo ${index + 1}`}
-                className="w-full h-full object-cover transition-transform hover:scale-105"
+        {/* YouTube Video Section */}
+        {collection.youtubeUrl && (
+          <div className="mb-12">
+            <div className="text-center mb-6">
+              <h2 className="font-playfair text-2xl font-bold text-brand-brown mb-2">
+                Watch the Journey
+              </h2>
+              <p className="text-gray-600">
+                Experience this adventure through video storytelling
+              </p>
+            </div>
+            <div className="max-w-4xl mx-auto">
+              <YouTubePlayer 
+                url={collection.youtubeUrl}
+                title={`${collection.title} - Video Journey`}
+                description="Follow along as we explore this incredible destination"
               />
             </div>
-          ))}
+          </div>
+        )}
+
+        {/* Photo Grid - Simple Layout */}
+        <div className="mb-8">
+          <h2 className="font-playfair text-2xl font-bold text-brand-brown text-center mb-8">
+            Photo Gallery
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-16" data-testid="photo-grid">
+            {collection.media.map((media, index) => (
+              <div
+                key={media.id}
+                className="aspect-square cursor-pointer overflow-hidden rounded-lg card-hover"
+                onClick={() => openLightbox(index)}
+                data-testid={`photo-${index}`}
+              >
+                <img
+                  src={media.url}
+                  alt={media.caption || `Photo ${index + 1}`}
+                  className="w-full h-full object-cover transition-transform hover:scale-105"
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Lightbox */}

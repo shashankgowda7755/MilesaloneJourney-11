@@ -62,6 +62,7 @@ export const galleryCollections = pgTable("gallery_collections", {
   coverImage: text("cover_image").notNull(),
   mediaCount: integer("media_count").notNull().default(0),
   location: text("location"),
+  youtubeUrl: text("youtube_url"), // YouTube video URL for the collection
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

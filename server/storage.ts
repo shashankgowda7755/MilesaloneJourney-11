@@ -77,6 +77,91 @@ export class MemStorage implements IStorage {
     this.initializeDefaultData();
   }
 
+  private getThemedImages(collectionId: string): string[] {
+    const imageCollections = {
+      'kashmir-floating-gardens': [
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1571018621578-de0c7d7c60ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1605538883669-825200433431?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1586500036706-41963de24d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800'
+      ],
+      'royal-rajasthan': [
+        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1583395496271-c7dbe8cb18ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1560414443-a9d3a46d4ed8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1604050854152-30fd728f93b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800'
+      ],
+      'cultural-celebrations': [
+        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1582802551599-ded14d515ce6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1560414443-a9d3a46d4ed8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1609155391331-83a3eaed86a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800'
+      ],
+      'mountain-adventures': [
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1605538883669-825200433431?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1571115764595-644a1f56a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800'
+      ],
+      'coastal-journeys': [
+        'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800',
+        'https://images.unsplash.com/photo-1585016495481-91613a3ab1bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800'
+      ]
+    };
+    
+    return imageCollections[collectionId as keyof typeof imageCollections] || imageCollections['kashmir-floating-gardens'];
+  }
+
+  private getImageCaption(collectionId: string, index: number): string {
+    const captions = {
+      'kashmir-floating-gardens': [
+        'Floating gardens on Dal Lake in early morning mist',
+        'Traditional houseboats with mountain backdrop',
+        'Shikara vendors selling fresh produce',
+        'Sunset reflections on Dal Lake',
+        'Local fishermen casting nets at dawn'
+      ],
+      'royal-rajasthan': [
+        'Desert dunes stretching into the horizon',
+        'Camel caravan crossing the Thar Desert',
+        'Traditional desert village life',
+        'Spectacular desert sunset with silhouettes',
+        'Sand dunes patterns shaped by wind'
+      ],
+      'cultural-celebrations': [
+        'Traditional dance performance during festival',
+        'Colorful rangoli art during celebration',
+        'Local musicians playing traditional instruments',
+        'Festival lights illuminating the night',
+        'Community gathering for cultural ceremony'
+      ],
+      'mountain-adventures': [
+        'Himalayan peaks covered in snow',
+        'Trekking path through mountain villages',
+        'Ancient mountain temple at sunrise',
+        'Valley view from mountain peak',
+        'Local villagers in traditional clothing'
+      ],
+      'coastal-journeys': [
+        'Serene backwaters with coconut palms',
+        'Traditional fishing boats at harbor',
+        'Coastal village life at sunset',
+        'Rocky shores with crashing waves',
+        'Lighthouse standing guard over the coast'
+      ]
+    };
+    
+    const collectionCaptions = captions[collectionId as keyof typeof captions] || captions['kashmir-floating-gardens'];
+    return collectionCaptions[index % collectionCaptions.length];
+  }
+
   private initializeDefaultData() {
     // Initialize journey tracking
     this.journeyTracking = {
@@ -220,21 +305,56 @@ export class MemStorage implements IStorage {
     const galleryData = [
       {
         id: "kashmir-floating-gardens",
-        title: "Kashmir's Floating Gardens",
+        title: "Kashmir Valley Adventures",
         description: "A visual journey through Dal Lake's famous floating gardens and traditional houseboats",
-        coverImage: "https://images.unsplash.com/photo-1571018621578-de0c7d7c60ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         mediaCount: 15,
         location: "Srinagar, Kashmir",
+        youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Sample travel video
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
         id: "royal-rajasthan",
-        title: "Royal Rajasthan",
-        description: "Capturing the architectural marvels and vibrant culture of Jaipur's palaces and markets",
-        coverImage: "https://images.unsplash.com/photo-1583395496271-c7dbe8cb18ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        mediaCount: 12,
-        location: "Jaipur, Rajasthan",
+        title: "Rajasthan Desert Life",
+        description: "The raw beauty of Thar Desert, camel safaris, nomadic communities, and the incredible resilience of life in one of India's most challenging landscapes",
+        coverImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        mediaCount: 18,
+        location: "Rajasthan, India",
+        youtubeUrl: "https://www.youtube.com/watch?v=jNQXAC9IVRw", // Sample desert video
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "cultural-celebrations",
+        title: "Cultural Celebrations",
+        description: "Vibrant festivals, traditional ceremonies, and local celebrations that showcase India's rich cultural diversity",
+        coverImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        mediaCount: 22,
+        location: "Various Locations",
+        youtubeUrl: "https://www.youtube.com/watch?v=9bZkp7q19f0", // Sample cultural video
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "mountain-adventures",
+        title: "Mountain Adventures",
+        description: "Trekking through the Himalayas, discovering hidden villages, and experiencing the raw beauty of India's mountain regions",
+        coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        mediaCount: 16,
+        location: "Himachal Pradesh",
+        youtubeUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4", // Sample mountain video
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "coastal-journeys",
+        title: "Coastal Journeys",
+        description: "From Kerala's serene backwaters to Tamil Nadu's rocky shores, exploring India's diverse coastal landscapes",
+        coverImage: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        mediaCount: 14,
+        location: "Southern Coast",
+        youtubeUrl: "https://www.youtube.com/watch?v=ZZ5LpwO-An4", // Sample coastal video
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -244,15 +364,17 @@ export class MemStorage implements IStorage {
     galleryData.forEach(gallery => {
       this.galleryCollections.set(gallery.id, gallery);
       
-      // Initialize some sample media for each collection
+      // Initialize some sample media for each collection with themed images
       const mediaItems: GalleryMedia[] = [];
+      const imageUrls = this.getThemedImages(gallery.id);
+      
       for (let i = 0; i < gallery.mediaCount; i++) {
         mediaItems.push({
           id: randomUUID(),
           collectionId: gallery.id,
-          type: i % 5 === 0 ? 'video' : 'photo',
-          url: `https://images.unsplash.com/photo-${1500000000000 + i}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800`,
-          caption: `Beautiful moment captured during the journey - Image ${i + 1}`,
+          type: 'photo',
+          url: imageUrls[i % imageUrls.length],
+          caption: this.getImageCaption(gallery.id, i),
           sortOrder: i,
           createdAt: new Date(),
         });
