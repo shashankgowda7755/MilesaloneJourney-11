@@ -338,8 +338,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Google OAuth endpoints
   app.get("/api/auth/google", (req, res) => {
+    console.log("Google OAuth redirect - Client ID:", process.env.GOOGLE_CLIENT_ID ? "Present" : "Missing");
+    console.log("Google OAuth redirect - Redirect URI:", process.env.GOOGLE_REDIRECT_URI);
+    
     // Redirect to Google OAuth
-    const googleAuthURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_REDIRECT_URI}&scope=email%20profile&response_type=code`;
+    const googleAuthURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.GOOGLE_REDIRECT_URI!)}&scope=email%20profile&response_type=code`;
+    console.log("Redirecting to:", googleAuthURL);
     res.redirect(googleAuthURL);
   });
 
