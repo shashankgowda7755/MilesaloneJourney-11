@@ -267,17 +267,14 @@ export default function DestinationDetail() {
         {/* Related Content */}
         <RelatedContent destination={destination} />
         
-        {/* Additional spacing after photos/content */}
-        <div className="h-16"></div>
+        {/* Large spacing (500px) after photos/content */}
+        <div style={{ height: '500px' }}></div>
 
-        {/* Continue Exploring Section - Similar to Letters */}
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center" data-testid="continue-exploring-section">
-          <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-6">
-            Continue Reading
-          </h3>
+        {/* Explore More Section */}
+        <div className="text-center" data-testid="explore-more-section">
           <Link href="/journey">
-            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90" data-testid="explore-more-destinations-button">
-              Explore More Destinations
+            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium" data-testid="explore-more-button">
+              Explore More
             </Button>
           </Link>
         </div>
