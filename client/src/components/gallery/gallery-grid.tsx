@@ -25,7 +25,7 @@ export default function GalleryGrid() {
   };
 
   return (
-    <div className="space-y-8" data-testid="gallery-grid">
+    <div className="space-y-8 gallery-grid" data-testid="gallery-grid">
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -46,9 +46,13 @@ export default function GalleryGrid() {
           {collections.map((collection) => (
             <Card 
               key={collection.id} 
-              className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer"
+              className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer gallery-collection-card"
               data-testid={`gallery-collection-${collection.id}`}
-              onClick={() => openLightbox(collection)}
+              onClick={() => {
+                if (collection.id) {
+                  openLightbox(collection);
+                }
+              }}
             >
               <div className="relative h-64">
                 <img

@@ -181,6 +181,19 @@
     touch-action: manipulation;
   }
 
+  /* Fix mobile scrolling issues on gallery collections */
+  @media (max-width: 768px) {
+    .gallery-collection-card {
+      touch-action: pan-y pan-x;
+    }
+    
+    .gallery-grid {
+      touch-action: pan-y;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
   @media (max-width: 768px) {
     /* Ensure content doesn't get hidden by mobile nav */
     .page-content {

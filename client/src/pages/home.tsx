@@ -367,9 +367,13 @@ export default function Home() {
               {customSelectedGallery.map((collection) => (
                 <Card 
                   key={collection.id} 
-                  className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer" 
+                  className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer gallery-collection-card" 
                   data-testid={`gallery-collection-${collection.id}`}
-                  onClick={() => window.open(`/gallery/${collection.id}`, '_blank')}
+                  onClick={() => {
+                    if (collection.id) {
+                      window.location.href = `/gallery/${collection.id}`;
+                    }
+                  }}
                 >
                   <div className="relative h-64">
                     <img
@@ -393,7 +397,7 @@ export default function Home() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open(`/gallery/${collection.id}`, '_blank');
+                          window.location.href = `/gallery/${collection.id}`;
                         }}
                         className="bg-white bg-opacity-20 backdrop-blur-sm text-white hover:bg-white hover:bg-opacity-30"
                         data-testid="collection-expand-button"
@@ -417,7 +421,7 @@ export default function Home() {
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open(`/gallery/${collection.id}`, '_blank');
+                          window.location.href = `/gallery/${collection.id}`;
                         }}
                         className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
                         data-testid={`collection-view-button-${collection.id}`}

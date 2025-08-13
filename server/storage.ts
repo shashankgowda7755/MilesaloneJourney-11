@@ -216,10 +216,10 @@ export class MemStorage implements IStorage {
       },
     ];
 
-    // First create sample gallery collections
+    // First create sample gallery collections with consistent IDs
     const galleryData = [
       {
-        id: randomUUID(),
+        id: "kashmir-floating-gardens",
         title: "Kashmir's Floating Gardens",
         description: "A visual journey through Dal Lake's famous floating gardens and traditional houseboats",
         coverImage: "https://images.unsplash.com/photo-1571018621578-de0c7d7c60ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -229,7 +229,7 @@ export class MemStorage implements IStorage {
         updatedAt: new Date(),
       },
       {
-        id: randomUUID(),
+        id: "royal-rajasthan",
         title: "Royal Rajasthan",
         description: "Capturing the architectural marvels and vibrant culture of Jaipur's palaces and markets",
         coverImage: "https://images.unsplash.com/photo-1583395496271-c7dbe8cb18ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -243,6 +243,21 @@ export class MemStorage implements IStorage {
     // Store galleries  
     galleryData.forEach(gallery => {
       this.galleryCollections.set(gallery.id, gallery);
+      
+      // Initialize some sample media for each collection
+      const mediaItems: GalleryMedia[] = [];
+      for (let i = 0; i < gallery.mediaCount; i++) {
+        mediaItems.push({
+          id: randomUUID(),
+          collectionId: gallery.id,
+          type: i % 5 === 0 ? 'video' : 'photo',
+          url: `https://images.unsplash.com/photo-${1500000000000 + i}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800`,
+          caption: `Beautiful moment captured during the journey - Image ${i + 1}`,
+          sortOrder: i,
+          createdAt: new Date(),
+        });
+      }
+      this.galleryMedia.set(gallery.id, mediaItems);
     });
 
     destinationsData.forEach(dest => {
@@ -255,8 +270,8 @@ export class MemStorage implements IStorage {
         isFeatured: dest.isFeatured ?? false,
         isCurrentLocation: dest.isCurrentLocation ?? false,
         // Connect destinations with galleries
-        relatedGalleryId: dest.slug === 'srinagar-kashmir' ? galleryData[0].id : 
-                          dest.slug === 'jaipur-rajasthan' ? galleryData[1].id : null,
+        relatedGalleryId: dest.slug === 'srinagar-kashmir' ? "kashmir-floating-gardens" : 
+                          dest.slug === 'jaipur-rajasthan' ? "royal-rajasthan" : null,
         relatedBlogPosts: dest.relatedBlogPosts ?? [],
         createdAt: new Date(),
         updatedAt: new Date(),
