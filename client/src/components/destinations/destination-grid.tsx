@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import DestinationCard from "./destination-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RotateCcw } from "lucide-react";
 import type { Destination } from "@shared/schema";
 
 const categories = [
@@ -39,6 +41,18 @@ export default function DestinationGrid() {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedRegion, setSelectedRegion] = useState("All Regions");
   const [sortBy, setSortBy] = useState("rating");
+
+  const resetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("All Categories");
+    setSelectedRegion("All Regions");
+    setSortBy("rating");
+  };
+
+  const hasActiveFilters = searchTerm !== "" || 
+    selectedCategory !== "All Categories" || 
+    selectedRegion !== "All Regions" || 
+    sortBy !== "rating";
 
   const { data: destinations = [], isLoading } = useQuery<Destination[]>({
     queryKey: [
@@ -77,53 +91,69 @@ export default function DestinationGrid() {
     <div className="space-y-8" data-testid="destination-grid">
       {/* Filters */}
       <div className="bg-brand-cream rounded-2xl p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Input
-            placeholder="Search destinations..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-            data-testid="destination-search-input"
-          />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
+            <Input
+              placeholder="Search destinations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full"
+              data-testid="destination-search-input"
+            />
+            
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger data-testid="destination-category-select">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map(category => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+              <SelectTrigger data-testid="destination-region-select">
+                <SelectValue placeholder="Region" />
+              </SelectTrigger>
+              <SelectContent>
+                {regions.map(region => (
+                  <SelectItem key={region} value={region}>
+                    {region}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger data-testid="destination-sort-select">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger data-testid="destination-category-select">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-            <SelectTrigger data-testid="destination-region-select">
-              <SelectValue placeholder="Region" />
-            </SelectTrigger>
-            <SelectContent>
-              {regions.map(region => (
-                <SelectItem key={region} value={region}>
-                  {region}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger data-testid="destination-sort-select">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              {sortOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Reset Filter Button */}
+          <div className="flex items-center">
+            <Button
+              onClick={resetFilters}
+              variant="outline"
+              disabled={!hasActiveFilters}
+              className="bg-white hover:bg-gray-50 text-gray-700 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="reset-filters-button"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Reset Filters
+            </Button>
+          </div>
         </div>
       </div>
 
