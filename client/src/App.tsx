@@ -15,10 +15,12 @@ import NotFound from "@/pages/not-found";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import MobileNav from "@/components/layout/mobile-nav";
+import ScrollToTop from "@/components/layout/scroll-to-top";
 
 function Router() {
   return (
     <div className="min-h-screen bg-brand-cream">
+      <ScrollToTop />
       <Header />
       <Switch>
         <Route path="/" component={Home} />

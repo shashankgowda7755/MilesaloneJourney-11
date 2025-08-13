@@ -217,6 +217,11 @@ export class MemStorage implements IStorage {
       const destination: Destination = {
         ...dest,
         id: randomUUID(),
+        highlights: dest.highlights ?? [],
+        activities: dest.activities ?? [],
+        rating: dest.rating ?? 30,
+        isFeatured: dest.isFeatured ?? false,
+        isCurrentLocation: dest.isCurrentLocation ?? false,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -375,6 +380,9 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
       const blogPost: BlogPost = {
         ...post,
         id: randomUUID(),
+        tags: post.tags ?? [],
+        isFeatured: post.isFeatured ?? false,
+        publishedAt: post.publishedAt ?? new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -413,6 +421,7 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
       const galleryCollection: GalleryCollection = {
         ...collection,
         id: randomUUID(),
+        location: collection.location ?? null,
         mediaCount: Math.floor(Math.random() * 20) + 10, // Random between 10-30
         createdAt: new Date(),
         updatedAt: new Date(),

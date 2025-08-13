@@ -157,21 +157,33 @@
     border: none !important;
   }
 
+  /* Mobile navigation - always fixed */
+  .mobile-bottom-nav {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: white;
+    border-top: 1px solid #E5E7EB;
+    padding: 8px 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+
   @media (max-width: 768px) {
-    .mobile-bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      background: white;
-      border-top: 1px solid #E5E7EB;
-      padding: 8px 0;
-    }
-    
     body {
-      padding-bottom: 80px;
+      padding-bottom: 80px !important;
     }
+  }
+
+  /* Smooth scrolling for navigation */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Ensure pages start from top */
+  .page-container {
+    scroll-margin-top: 0;
   }
 }
 
