@@ -1,10 +1,11 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, Calendar } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Search } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import GalleryGrid from "@/components/gallery/gallery-grid";
 import Lightbox from "@/components/gallery/lightbox";
 import { useState } from "react";
@@ -14,6 +15,7 @@ export default function Gallery() {
   const { id } = useParams<{ id?: string }>();
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: collection, isLoading: collectionLoading, error } = useQuery<GalleryCollectionWithMedia>({
     queryKey: ["/api/gallery", id],

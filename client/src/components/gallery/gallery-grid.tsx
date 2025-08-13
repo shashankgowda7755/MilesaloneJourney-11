@@ -1,28 +1,15 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Image, Expand } from "lucide-react";
-import Lightbox from "./lightbox";
+import { Play, Image, Camera } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
 import type { GalleryCollectionWithMedia } from "@shared/schema";
 
 export default function GalleryGrid() {
-  const [selectedCollection, setSelectedCollection] = useState<GalleryCollectionWithMedia | null>(null);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-
   const { data: collections = [], isLoading } = useQuery<GalleryCollectionWithMedia[]>({
     queryKey: ["/api/gallery"],
   });
-
-  const openLightbox = (collection: GalleryCollectionWithMedia, startIndex = 0) => {
-    setSelectedCollection(collection);
-    setLightboxIndex(startIndex);
-  };
-
-  const closeLightbox = () => {
-    setSelectedCollection(null);
-  };
 
   return (
     <div className="space-y-8 gallery-grid" data-testid="gallery-grid">
@@ -44,104 +31,78 @@ export default function GalleryGrid() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8" data-testid="gallery-collections-grid">
           {collections.map((collection) => (
-            <Card 
-              key={collection.id} 
-              className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer gallery-collection-card"
-              data-testid={`gallery-collection-${collection.id}`}
-              onClick={() => {
-                if (collection.id) {
-                  openLightbox(collection);
-                }
-              }}
-            >
-              <div className="relative h-64">
-                <img
-                  src={collection.coverImage}
-                  alt={collection.title}
-                  className="w-full h-full object-cover"
-                  data-testid="collection-cover-image"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="font-playfair text-2xl font-bold mb-1" data-testid="collection-title">
-                    {collection.title}
-                  </h3>
-                  <p className="text-sm opacity-90" data-testid="collection-media-count">
-                    {collection.mediaCount} photos • {Math.floor(collection.mediaCount / 5)} videos
+            <Link key={collection.id} href={`/gallery/${collection.id}`}>
+              <Card className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer gallery-collection-card"
+                    data-testid={`gallery-collection-${collection.id}`}>
+                <div className="relative h-64">
+                  <img
+                    src={collection.coverImage}
+                    alt={collection.title}
+                    className="w-full h-full object-cover"
+                    data-testid="collection-cover-image"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="font-playfair text-2xl font-bold mb-1" data-testid="collection-title">
+                      {collection.title}
+                    </h3>
+                    <p className="text-sm opacity-90" data-testid="collection-media-count">
+                      {collection.mediaCount} photos • {Math.floor(collection.mediaCount / 5)} videos
+                    </p>
+                  </div>
+                </div>
+                
+                <CardContent className="p-6">
+                  <p className="text-gray-600 mb-4" data-testid="collection-description">
+                    {collection.description}
                   </p>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openLightbox(collection);
-                    }}
-                    className="bg-white bg-opacity-20 backdrop-blur-sm text-white hover:bg-white hover:bg-opacity-30"
-                    data-testid="collection-expand-button"
-                  >
-                    <Expand className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-              
-              <CardContent className="p-6">
-                <p className="text-gray-600 mb-4" data-testid="collection-description">
-                  {collection.description}
-                </p>
-                
-                {/* Media thumbnails strip */}
-                <div className="flex space-x-2 overflow-x-auto pb-2 mb-4" data-testid="collection-thumbnails">
-                  {collection.media.slice(0, 4).map((media, index) => (
-                    <div
-                      key={media.id}
-                      className="relative w-20 h-12 flex-shrink-0 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openLightbox(collection, index);
-                      }}
-                      data-testid={`thumbnail-${index}`}
-                    >
-                      <img
-                        src={media.url}
-                        alt={media.caption || `Media ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                      {media.type === 'video' && (
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                          <Play className="h-4 w-4 text-white" />
-                        </div>
-                      )}
+                  
+                  {/* Media thumbnails strip */}
+                  <div className="flex space-x-2 overflow-x-auto pb-2 mb-4" data-testid="collection-thumbnails">
+                    {collection.media.slice(0, 4).map((media, index) => (
+                      <div
+                        key={media.id}
+                        className="relative w-20 h-12 flex-shrink-0 rounded-lg overflow-hidden"
+                        data-testid={`thumbnail-${index}`}
+                      >
+                        <img
+                          src={media.url}
+                          alt={media.caption || `Photo ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {media.type === 'video' && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                            <Play className="w-4 h-4 text-white fill-current" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {collection.mediaCount > 4 && (
+                      <div className="w-20 h-12 flex-shrink-0 rounded-lg bg-gray-200 flex items-center justify-center text-gray-500 text-xs">
+                        +{collection.mediaCount - 4}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500" data-testid="collection-location">
+                      {collection.location}
                     </div>
-                  ))}
-                </div>
-                
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openLightbox(collection);
-                  }}
-                  className="w-full bg-brand-orange text-white hover:bg-brand-orange/90"
-                  data-testid="view-collection-button"
-                >
-                  <Image className="h-4 w-4 mr-2" />
-                  View Full Collection
-                </Button>
-              </CardContent>
-            </Card>
+                    <Button 
+                      size="sm"
+                      variant="outline"
+                      className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+                      data-testid={`collection-view-button-${collection.id}`}
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      View Collection
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
-      )}
-
-      {/* Lightbox */}
-      {selectedCollection && (
-        <Lightbox
-          collection={selectedCollection}
-          initialIndex={lightboxIndex}
-          onClose={closeLightbox}
-          onIndexChange={setLightboxIndex}
-        />
       )}
     </div>
   );
