@@ -6,10 +6,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import type { GalleryCollectionWithMedia } from "@shared/schema";
 
-export default function GalleryGrid() {
-  const { data: collections = [], isLoading } = useQuery<GalleryCollectionWithMedia[]>({
+interface GalleryGridProps {
+  searchQuery?: string;
+}
+
+export default function GalleryGrid({ searchQuery = "" }: GalleryGridProps) {
+  const { data: allCollections = [], isLoading } = useQuery<GalleryCollectionWithMedia[]>({
     queryKey: ["/api/gallery"],
   });
+
+  // Filter collections based on search query
+  const collections = allCollections.filter(collection => 
+    collection.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    collection.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (collection.location && collection.location.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div className="space-y-8 gallery-grid" data-testid="gallery-grid">
