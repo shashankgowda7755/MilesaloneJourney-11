@@ -29,11 +29,7 @@ export default function MobileNav() {
           return (
             <button
               key={item.name}
-              className={`flex flex-col items-center space-y-1 px-2 py-1 transition-all cursor-pointer relative ${
-                active 
-                  ? "mobile-nav-active text-white" 
-                  : "text-gray-600 hover:text-brand-orange"
-              }`}
+              className="flex flex-col items-center space-y-1 px-2 py-1 transition-all cursor-pointer relative text-gray-600 hover:text-brand-orange pt-[2px] pb-[2px] pl-[12px] pr-[12px] ml-[0px] mr-[0px]"
               data-testid={`mobile-nav-${item.name.toLowerCase()}`}
               onClick={() => {
                 navigate(item.href);
