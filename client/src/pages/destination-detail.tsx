@@ -270,17 +270,14 @@ export default function DestinationDetail() {
         {/* Additional spacing after photos/content */}
         <div className="h-16"></div>
 
-        {/* Back to Journey */}
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center" data-testid="back-to-journey-section">
+        {/* Continue Exploring Section - Similar to Letters */}
+        <div className="mt-12 pt-8 border-t border-gray-200 text-center" data-testid="continue-exploring-section">
           <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-6">
-            Want to See Maps & More Destinations?
+            Continue Reading
           </h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Return to the Journey section to explore interactive maps, discover other destinations, and continue your travel planning.
-          </p>
           <Link href="/journey">
-            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium" data-testid="explore-more-button">
-              Explore More
+            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90" data-testid="explore-more-destinations-button">
+              Explore More Destinations
             </Button>
           </Link>
         </div>
