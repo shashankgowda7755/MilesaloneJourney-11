@@ -55,10 +55,11 @@ Preferred communication style: Simple, everyday language.
 ### Key Features
 - **Interactive Journey Map**: Real-time location tracking with journey waypoints and route visualization
 - **Content Management**: Admin dashboard for managing blog posts, destinations, and gallery content
-- **Search and Filtering**: Advanced filtering for blog posts and destinations by category, region, and other criteria
+- **Gallery System with YouTube Integration**: Photo collections with embedded YouTube video players featuring autoplay, thumbnails, and responsive design
+- **Search and Filtering**: Advanced filtering for blog posts, destinations, and gallery collections with real-time search
 - **Newsletter Integration**: Email subscription system for journey updates
-- **Mobile Optimization**: Bottom navigation and mobile-first responsive design
-- **Performance**: Image optimization, query caching, and efficient state management
+- **Mobile Optimization**: Bottom navigation and mobile-first responsive design with touch-friendly interfaces
+- **Performance**: Image optimization, query caching, and efficient state management with lazy loading
 
 ### Development and Deployment
 - **Build Process**: Vite for frontend bundling, esbuild for server bundling
