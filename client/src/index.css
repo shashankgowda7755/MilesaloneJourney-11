@@ -182,10 +182,6 @@
   }
 
   @media (max-width: 768px) {
-    body {
-      padding-bottom: 100px !important;
-    }
-    
     /* Ensure content doesn't get hidden by mobile nav */
     .page-content {
       margin-bottom: 120px;
@@ -194,6 +190,11 @@
     /* Fix for pages with bottom buttons/content */
     .destination-detail-page {
       padding-bottom: 140px !important;
+    }
+    
+    /* Ensure footer is visible above mobile navigation */
+    footer {
+      margin-bottom: 80px !important;
     }
   }
 
