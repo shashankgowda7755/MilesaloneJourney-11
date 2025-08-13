@@ -261,26 +261,27 @@ export default function DestinationDetail() {
           </div>
         </div>
 
-        {/* Related Content */}
-        <RelatedContent destination={destination} />
+        {/* Maps and Photos Section */}
+        <div className="mt-12 space-y-6">
+          <RelatedContent destination={destination} />
+        </div>
         
-        {/* Spacing after maps and gallery content */}
-        <div className="mt-12 mb-8"></div>
-
-        {/* Explore More Section */}
-        <div className="text-center py-8 mb-32" data-testid="explore-more-section">
-          <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-4">
-            Discover More Destinations
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Continue your journey and explore other amazing destinations from Kashmir to Kanyakumari
-          </p>
-          <Link href="/journey">
-            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all" data-testid="explore-more-button">
-              <Navigation className="mr-2 h-5 w-5" />
-              Explore More Destinations
-            </Button>
-          </Link>
+        {/* Explore More Section - positioned after maps and photos */}
+        <div className="mt-12 pt-8 border-t border-gray-200" data-testid="explore-more-section">
+          <div className="text-center py-8 mb-32">
+            <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-4">
+              Continue Exploring
+            </h3>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              Dive deeper into more destinations and experiences from the Kashmir to Kanyakumari journey
+            </p>
+            <Link href="/journey">
+              <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all" data-testid="explore-more-button">
+                <Navigation className="mr-2 h-5 w-5" />
+                Explore More Destinations
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
