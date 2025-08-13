@@ -1,22 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings, LogOut, Plus } from "lucide-react";
 import AdminStats from "@/components/admin/admin-stats";
 import AdminDashboard from "@/components/admin/admin-dashboard";
+import BlogPostManager from "@/components/admin/blog-post-manager";
+import DestinationManager from "@/components/admin/destination-manager";
+import GalleryManager from "@/components/admin/gallery-manager";
+import MessageManager from "@/components/admin/message-manager";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Check authentication status
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['/api/auth/user'],
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (user) {
+      setIsAuthenticated(true);
+    }
+  }, [user]);
+
   const handleLogin = () => {
-    // Simple mock authentication for demo
-    setIsAuthenticated(true);
+    window.location.href = '/api/auth/google';
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setIsAuthenticated(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-orange"></div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -102,65 +132,19 @@ export default function Admin() {
           </TabsContent>
 
           <TabsContent value="posts" className="mt-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Blog Posts Management</CardTitle>
-                  <Button className="bg-brand-orange text-white hover:bg-brand-orange/90">
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Post
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Blog post management interface would go here.</p>
-              </CardContent>
-            </Card>
+            <BlogPostManager />
           </TabsContent>
 
           <TabsContent value="destinations" className="mt-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Destinations Management</CardTitle>
-                  <Button className="bg-brand-green text-white hover:bg-brand-green/90">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Destination
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Destination management interface would go here.</p>
-              </CardContent>
-            </Card>
+            <DestinationManager />
           </TabsContent>
 
           <TabsContent value="gallery" className="mt-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Gallery Management</CardTitle>
-                  <Button className="bg-blue-500 text-white hover:bg-blue-500/90">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Upload Photos
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Gallery management interface would go here.</p>
-              </CardContent>
-            </Card>
+            <GalleryManager />
           </TabsContent>
 
           <TabsContent value="messages" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Messages</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Contact messages interface would go here.</p>
-              </CardContent>
-            </Card>
+            <MessageManager />
           </TabsContent>
         </Tabs>
       </div>
