@@ -29,6 +29,7 @@ function Router() {
         <Route path="/letters" component={Letters} />
         <Route path="/letters/:slug" component={BlogPost} />
         <Route path="/gallery" component={Gallery} />
+        <Route path="/gallery/:id" component={Gallery} />
         <Route path="/about" component={About} />
         <Route path="/admin" component={Admin} />
         <Route component={NotFound} />

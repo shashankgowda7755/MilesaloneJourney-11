@@ -369,7 +369,7 @@ export default function Home() {
                   key={collection.id} 
                   className="overflow-hidden shadow-lg card-hover bg-white cursor-pointer" 
                   data-testid={`gallery-collection-${collection.id}`}
-                  onClick={() => window.open('/gallery', '_blank')}
+                  onClick={() => window.open(`/gallery/${collection.id}`, '_blank')}
                 >
                   <div className="relative h-64">
                     <img
@@ -393,7 +393,7 @@ export default function Home() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open('/gallery', '_blank');
+                          window.open(`/gallery/${collection.id}`, '_blank');
                         }}
                         className="bg-white bg-opacity-20 backdrop-blur-sm text-white hover:bg-white hover:bg-opacity-30"
                         data-testid="collection-expand-button"
@@ -417,7 +417,7 @@ export default function Home() {
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open('/gallery', '_blank');
+                          window.open(`/gallery/${collection.id}`, '_blank');
                         }}
                         className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
                         data-testid={`collection-view-button-${collection.id}`}
