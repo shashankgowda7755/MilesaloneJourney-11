@@ -1,6 +1,6 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Clock, Calendar, Tag, Share2 } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Tag, Share2, BookOpen } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -180,20 +180,21 @@ export default function BlogPost() {
 
         {/* Related Posts Navigation */}
         <div className="mt-12 pt-8 border-t border-gray-200" data-testid="related-posts">
-          <div className="text-center">
-            <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-6">
+          <div className="text-center py-8 mb-32">
+            <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-4">
               Continue Reading
             </h3>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              Dive deeper into more travel stories and experiences from the Kashmir to Kanyakumari journey
+            </p>
             <Link href="/letters">
-              <Button className="bg-brand-orange text-white hover:bg-brand-orange/90">
+              <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all">
+                <BookOpen className="mr-2 h-5 w-5" />
                 Explore More Stories
               </Button>
             </Link>
           </div>
         </div>
-        
-        {/* Bottom spacer to prevent navigation overlap */}
-        <div className="h-24"></div>
       </div>
     </div>
   );

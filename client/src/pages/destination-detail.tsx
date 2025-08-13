@@ -264,20 +264,24 @@ export default function DestinationDetail() {
         {/* Related Content */}
         <RelatedContent destination={destination} />
         
-        {/* Extra large spacing (1500px) after maps and any gallery/content */}
-        <div style={{ height: '1500px' }}></div>
+        {/* Spacing after maps and gallery content */}
+        <div className="mt-12 mb-8"></div>
 
         {/* Explore More Section */}
-        <div className="text-center" data-testid="explore-more-section">
+        <div className="text-center py-8 mb-32" data-testid="explore-more-section">
+          <h3 className="font-playfair text-2xl font-bold text-brand-brown mb-4">
+            Discover More Destinations
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            Continue your journey and explore other amazing destinations from Kashmir to Kanyakumari
+          </p>
           <Link href="/journey">
-            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium" data-testid="explore-more-button">
-              Explore More
+            <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 px-8 py-3 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all" data-testid="explore-more-button">
+              <Navigation className="mr-2 h-5 w-5" />
+              Explore More Destinations
             </Button>
           </Link>
         </div>
-        
-        {/* Extra large bottom spacing (1500px) after Explore More button */}
-        <div style={{ height: '1500px' }}></div>
       </div>
     </div>
   );
