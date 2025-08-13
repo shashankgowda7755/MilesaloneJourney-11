@@ -2,17 +2,27 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Calendar, Route, Coins, ChevronDown, Mail, BookOpen, Images, Navigation } from "lucide-react";
+import { MapPin, Calendar, Route, Coins, ChevronDown, Mail, BookOpen, Images, Navigation, Star, Camera, Expand } from "lucide-react";
 import InteractiveMap from "@/components/journey/interactive-map";
 import BlogCard from "@/components/blog/blog-card";
 import NewsletterForm from "@/components/newsletter/newsletter-form";
 import { useJourney } from "@/hooks/use-journey";
-import type { BlogPost } from "@shared/schema";
+import type { BlogPost, Destination, GalleryCollection } from "@shared/schema";
 
 export default function Home() {
   const { data: journey } = useJourney();
   const { data: featuredPosts = [] } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog-posts/featured"],
+  });
+  
+  // Custom selected destinations for guides section
+  const { data: destinations = [] } = useQuery<Destination[]>({
+    queryKey: ["/api/destinations"],
+  });
+  
+  // Custom selected gallery collections
+  const { data: galleryCollections = [] } = useQuery<GalleryCollection[]>({
+    queryKey: ["/api/gallery"],
   });
 
   const scrollToSection = (sectionId: string) => {
@@ -29,6 +39,25 @@ export default function Home() {
   const handleViewAllGalleries = () => {
     window.open('/gallery', '_blank');
   };
+
+  // Custom selected travel stories (best 3)
+  const customFeaturedStories = [
+    featuredPosts.find(post => post.slug === 'delhi-streets-culinary-adventure') || featuredPosts[0],
+    featuredPosts[1],
+    featuredPosts[2]
+  ].filter(Boolean);
+
+  // Custom selected guides (best 2)
+  const customSelectedGuides = [
+    destinations.find(dest => dest.slug === 'srinagar-kashmir') || destinations[0],
+    destinations.find(dest => dest.slug === 'kanyakumari-tamil-nadu') || destinations[1]
+  ].filter(Boolean);
+
+  // Custom selected gallery collections (best ones)
+  const customSelectedGallery = [
+    galleryCollections[0],
+    galleryCollections[1]
+  ].filter(Boolean);
 
   return (
     <div className="min-h-screen">
@@ -198,7 +227,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Blog Posts */}
+      {/* Latest Travel Stories */}
       <section className="py-16 lg:py-24 bg-brand-cream" data-testid="featured-posts-section">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
@@ -210,9 +239,9 @@ export default function Home() {
             </p>
           </div>
 
-          {featuredPosts.length > 0 ? (
+          {customFeaturedStories.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12" data-testid="featured-posts-grid">
-              {featuredPosts.slice(0, 3).map((post) => (
+              {customFeaturedStories.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}
             </div>
@@ -230,6 +259,178 @@ export default function Home() {
                 data-testid="view-all-stories-button"
               >
                 View All Stories
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Travel Guides Section */}
+      <section className="py-16 lg:py-24 bg-white" data-testid="guides-section">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="guides-title">
+              Travel Guides
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="guides-description">
+              Comprehensive guides to the most incredible destinations on this journey. From planning to experiencing, get insider tips for authentic travel.
+            </p>
+          </div>
+
+          {customSelectedGuides.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12" data-testid="guides-grid">
+              {customSelectedGuides.map((destination) => (
+                <Card key={destination.id} className="overflow-hidden shadow-lg card-hover bg-white" data-testid={`guide-card-${destination.slug}`}>
+                  <div className="relative h-64">
+                    <img
+                      src={destination.featuredImage}
+                      alt={destination.name}
+                      className="w-full h-full object-cover"
+                      data-testid="guide-card-image"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <h3 className="font-playfair text-2xl font-bold mb-1" data-testid="guide-card-title">
+                        {destination.name}
+                      </h3>
+                      <p className="text-sm opacity-90" data-testid="guide-card-location">
+                        {destination.state}, {destination.region}
+                      </p>
+                    </div>
+                    <div className="absolute top-4 right-4">
+                      <div className="flex items-center space-x-1 bg-white bg-opacity-90 rounded-full px-2 py-1" data-testid="guide-card-rating">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm font-medium">{(destination.rating / 10).toFixed(1)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <CardContent className="p-6">
+                    <p className="text-gray-600 mb-4 line-clamp-3" data-testid="guide-card-description">
+                      {destination.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <span data-testid="guide-card-category">{destination.category}</span>
+                        <span data-testid="guide-card-difficulty">{destination.difficulty}</span>
+                      </div>
+                      <Link href={`/journey/${destination.slug}`}>
+                        <Button 
+                          size="sm"
+                          className="bg-brand-orange text-white hover:bg-brand-orange/90"
+                          data-testid={`guide-view-button-${destination.slug}`}
+                        >
+                          <MapPin className="w-4 h-4 mr-2" />
+                          View Guide
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12" data-testid="no-guides">
+              <p className="text-gray-500">No travel guides available yet.</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <Link href="/journey">
+              <Button 
+                size="lg"
+                className="bg-brand-green text-white hover:bg-brand-green/90 px-8 py-4 font-semibold"
+                data-testid="view-all-guides-button"
+              >
+                View All Guides
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section className="py-16 lg:py-24 bg-brand-cream" data-testid="gallery-section">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="gallery-title">
+              Visual Journey
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="gallery-description">
+              Every photograph tells a story of discovery, challenge, and the incredible diversity of landscapes, cultures, and moments that define authentic India travel.
+            </p>
+          </div>
+
+          {customSelectedGallery.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12" data-testid="gallery-grid">
+              {customSelectedGallery.map((collection) => (
+                <Card key={collection.id} className="overflow-hidden shadow-lg card-hover bg-white" data-testid={`gallery-collection-${collection.id}`}>
+                  <div className="relative h-64">
+                    <img
+                      src={collection.coverImage}
+                      alt={collection.title}
+                      className="w-full h-full object-cover"
+                      data-testid="collection-cover-image"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <h3 className="font-playfair text-2xl font-bold mb-1" data-testid="collection-title">
+                        {collection.title}
+                      </h3>
+                      <p className="text-sm opacity-90" data-testid="collection-media-count">
+                        {collection.mediaCount} photos • {Math.floor(collection.mediaCount / 5)} videos
+                      </p>
+                    </div>
+                    <div className="absolute top-4 right-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="bg-white bg-opacity-20 backdrop-blur-sm text-white hover:bg-white hover:bg-opacity-30"
+                        data-testid="collection-expand-button"
+                      >
+                        <Expand className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <CardContent className="p-6">
+                    <p className="text-gray-600 mb-4 line-clamp-3" data-testid="collection-description">
+                      {collection.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-500" data-testid="collection-location">
+                        {collection.location}
+                      </div>
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+                        data-testid={`collection-view-button-${collection.id}`}
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        View Collection
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12" data-testid="no-gallery-collections">
+              <p className="text-gray-500">No gallery collections available yet.</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <Link href="/gallery">
+              <Button 
+                size="lg"
+                className="bg-brand-green text-white hover:bg-brand-green/90 px-8 py-4 font-semibold"
+                data-testid="view-all-gallery-button"
+              >
+                View All Collections
               </Button>
             </Link>
           </div>
