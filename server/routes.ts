@@ -336,55 +336,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Google OAuth endpoints
-  app.get("/api/auth/google", (req, res) => {
-    console.log("Google OAuth redirect - Client ID:", process.env.GOOGLE_CLIENT_ID ? "Present" : "Missing");
-    console.log("Google OAuth redirect - Redirect URI:", process.env.GOOGLE_REDIRECT_URI);
-    
-    // Redirect to Google OAuth
-    const googleAuthURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.GOOGLE_REDIRECT_URI!)}&scope=email%20profile&response_type=code`;
-    console.log("Redirecting to:", googleAuthURL);
-    res.redirect(googleAuthURL);
-  });
-
-  app.get("/api/auth/google/callback", async (req, res) => {
+  // Simple password authentication
+  app.post("/api/auth/login", async (req, res) => {
     try {
-      const { code } = req.query;
+      const { password } = req.body;
       
-      // Exchange code for access token
-      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: process.env.GOOGLE_CLIENT_ID!,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-          code: code as string,
-          grant_type: 'authorization_code',
-          redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
-        }),
-      });
-
-      const tokens = await tokenResponse.json();
-      
-      // Get user info
-      const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-        },
-      });
-
-      const user = await userResponse.json();
-      
-      // Store user session (simplified)
-      req.session = req.session || {};
-      (req.session as any).user = user;
-      
-      res.redirect('/admin?authenticated=true');
+      // Simple password check
+      if (password === "123456") {
+        // Store user session
+        req.session = req.session || {};
+        (req.session as any).user = {
+          id: "admin",
+          name: "Administrator",
+          email: "admin@travel-blog.com"
+        };
+        
+        res.json({ success: true, message: "Login successful" });
+      } else {
+        res.status(401).json({ success: false, message: "Invalid password" });
+      }
     } catch (error) {
-      console.error("Error during Google OAuth:", error);
-      res.redirect('/admin?error=auth_failed');
+      console.error("Error during login:", error);
+      res.status(500).json({ success: false, message: "Login failed" });
     }
   });
 
