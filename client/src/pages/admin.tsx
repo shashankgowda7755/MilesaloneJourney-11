@@ -231,6 +231,45 @@ export default function Admin() {
                 const tabsTrigger = document.querySelector('[value="destinations"]') as HTMLElement;
                 tabsTrigger?.click();
               }}
+              onEditPost={(post) => {
+                // Switch to posts tab and trigger edit for specific post
+                const tabsTrigger = document.querySelector('[value="posts"]') as HTMLElement;
+                tabsTrigger?.click();
+                setTimeout(() => {
+                  // Find and click edit button for this specific post
+                  const editButtons = document.querySelectorAll('[data-testid^="edit-post-"]');
+                  const targetButton = Array.from(editButtons).find(btn => 
+                    btn.getAttribute('data-testid')?.includes(post.id)
+                  ) as HTMLElement;
+                  targetButton?.click();
+                }, 200);
+              }}
+              onEditDestination={(destination) => {
+                // Switch to destinations tab and trigger edit for specific destination
+                const tabsTrigger = document.querySelector('[value="destinations"]') as HTMLElement;
+                tabsTrigger?.click();
+                setTimeout(() => {
+                  // Find and click edit button for this specific destination
+                  const editButtons = document.querySelectorAll('[data-testid^="edit-destination-"]');
+                  const targetButton = Array.from(editButtons).find(btn => 
+                    btn.getAttribute('data-testid')?.includes(destination.id)
+                  ) as HTMLElement;
+                  targetButton?.click();
+                }, 200);
+              }}
+              onEditGallery={(collection) => {
+                // Switch to gallery tab and trigger edit for specific collection
+                const tabsTrigger = document.querySelector('[value="gallery"]') as HTMLElement;
+                tabsTrigger?.click();
+                setTimeout(() => {
+                  // Find and click edit button for this specific collection
+                  const editButtons = document.querySelectorAll('[data-testid^="edit-collection-"]');
+                  const targetButton = Array.from(editButtons).find(btn => 
+                    btn.getAttribute('data-testid')?.includes(collection.id)
+                  ) as HTMLElement;
+                  targetButton?.click();
+                }, 200);
+              }}
             />
           </TabsContent>
 
