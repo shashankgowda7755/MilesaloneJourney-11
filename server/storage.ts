@@ -46,6 +46,7 @@ export interface IStorage {
   getGalleryCollections(): Promise<GalleryCollectionWithMedia[]>;
   getGalleryCollection(id: string): Promise<GalleryCollectionWithMedia | undefined>;
   createGalleryCollection(collection: InsertGalleryCollection): Promise<GalleryCollection>;
+  updateGalleryCollection(id: string, collection: Partial<InsertGalleryCollection>): Promise<GalleryCollection | undefined>;
   addMediaToCollection(collectionId: string, media: InsertGalleryMedia): Promise<GalleryMedia>;
   deleteGalleryCollection(id: string): Promise<boolean>;
 
@@ -777,12 +778,28 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
       ...insertCollection,
       id,
       mediaCount: 0,
+      isVisible: insertCollection.isVisible ?? true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     this.galleryCollections.set(id, collection);
     this.galleryMedia.set(id, []);
     return collection;
+  }
+
+  async updateGalleryCollection(id: string, updates: Partial<InsertGalleryCollection>): Promise<GalleryCollection | undefined> {
+    const collection = this.galleryCollections.get(id);
+    if (!collection) return undefined;
+
+    const updatedCollection: GalleryCollection = {
+      ...collection,
+      ...updates,
+      id, // Ensure ID doesn't change
+      updatedAt: new Date(),
+    };
+    
+    this.galleryCollections.set(id, updatedCollection);
+    return updatedCollection;
   }
 
   async addMediaToCollection(collectionId: string, insertMedia: InsertGalleryMedia): Promise<GalleryMedia> {

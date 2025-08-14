@@ -65,6 +65,7 @@ export const galleryCollections = pgTable("gallery_collections", {
   mediaCount: integer("media_count").notNull().default(0),
   location: text("location"),
   youtubeUrl: text("youtube_url"), // YouTube video URL for the collection
+  isVisible: boolean("is_visible").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -73,9 +74,13 @@ export const galleryCollections = pgTable("gallery_collections", {
 export const galleryMedia = pgTable("gallery_media", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   collectionId: varchar("collection_id").notNull().references(() => galleryCollections.id, { onDelete: "cascade" }),
-  type: text("type").notNull(), // photo, video
+  type: text("type").notNull(), // photo, video, youtube, embedded_video, link
   url: text("url").notNull(),
+  thumbnailUrl: text("thumbnail_url"), // For videos and links
+  title: text("title"), // For links and embedded content
   caption: text("caption"),
+  embedCode: text("embed_code"), // For embedded videos
+  linkUrl: text("link_url"), // For external links
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

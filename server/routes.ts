@@ -152,13 +152,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/gallery/:id/media", async (req, res) => {
+  app.put("/api/gallery/:id", async (req, res) => {
     try {
-      const validatedData = insertGalleryMediaSchema.parse({
-        ...req.body,
-        collectionId: req.params.id,
-      });
-      const media = await storage.addMediaToCollection(req.params.id, validatedData);
+      const validatedData = insertGalleryCollectionSchema.partial().parse(req.body);
+      const collection = await storage.updateGalleryCollection(req.params.id, validatedData);
+      if (!collection) {
+        return res.status(404).json({ message: "Gallery collection not found" });
+      }
+      res.json(collection);
+    } catch (error) {
+      console.error("Error updating gallery collection:", error);
+      res.status(500).json({ message: "Failed to update gallery collection" });
+    }
+  });
+
+  app.post("/api/gallery/media", async (req, res) => {
+    try {
+      const validatedData = insertGalleryMediaSchema.parse(req.body);
+      const media = await storage.addMediaToCollection(validatedData.collectionId, validatedData);
       res.status(201).json(media);
     } catch (error) {
       console.error("Error adding media to collection:", error);
