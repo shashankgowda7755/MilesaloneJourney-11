@@ -36,10 +36,20 @@ export default function Admin() {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (password: string) => {
-      return await apiRequest('/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
-        body: { password }
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Login failed');
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       setIsAuthenticated(true);
