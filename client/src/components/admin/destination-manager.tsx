@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, MapPin, Star } from "lucide-react";
+import { Plus, Edit, Trash2, MapPin, Star, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertDestinationSchema, type Destination, type InsertDestination } from "@shared/schema";
@@ -555,6 +555,15 @@ export default function DestinationManager() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open(`/journey/${destination.slug}`, '_blank')}
+                    data-testid={`view-destination-${destination.id}`}
+                    title="View destination"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
