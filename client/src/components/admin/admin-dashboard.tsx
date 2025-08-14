@@ -2,29 +2,48 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, MapPin, Camera, FileText, Map } from "lucide-react";
 
-export default function AdminDashboard() {
+interface AdminDashboardProps {
+  onNewPost?: () => void;
+  onAddDestination?: () => void;
+  onUploadPhotos?: () => void;
+  onUpdateLocation?: () => void;
+}
+
+export default function AdminDashboard({ onNewPost, onAddDestination, onUploadPhotos, onUpdateLocation }: AdminDashboardProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" data-testid="admin-dashboard">
       <div className="lg:col-span-2">
         <Card className="bg-white p-6 shadow-sm">
           <h3 className="font-playfair text-xl font-bold text-brand-brown mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
-            <Button className="bg-brand-orange text-white p-6 rounded-xl font-medium hover:bg-brand-orange/90 h-auto flex-col space-y-2">
+            <Button 
+              className="bg-brand-orange text-white p-6 rounded-xl font-medium hover:bg-brand-orange/90 h-auto flex-col space-y-2"
+              onClick={onNewPost}
+            >
               <Plus className="h-6 w-6" />
               <div>New Post</div>
             </Button>
             
-            <Button className="bg-brand-green text-white p-6 rounded-xl font-medium hover:bg-brand-green/90 h-auto flex-col space-y-2">
+            <Button 
+              className="bg-brand-green text-white p-6 rounded-xl font-medium hover:bg-brand-green/90 h-auto flex-col space-y-2"
+              onClick={onAddDestination}
+            >
               <Map className="h-6 w-6" />
               <div>Add Destination</div>
             </Button>
             
-            <Button className="bg-blue-500 text-white p-6 rounded-xl font-medium hover:bg-blue-500/90 h-auto flex-col space-y-2">
+            <Button 
+              className="bg-blue-500 text-white p-6 rounded-xl font-medium hover:bg-blue-500/90 h-auto flex-col space-y-2"
+              onClick={onUploadPhotos}
+            >
               <Camera className="h-6 w-6" />
               <div>Upload Photos</div>
             </Button>
             
-            <Button className="bg-purple-500 text-white p-6 rounded-xl font-medium hover:bg-purple-500/90 h-auto flex-col space-y-2">
+            <Button 
+              className="bg-purple-500 text-white p-6 rounded-xl font-medium hover:bg-purple-500/90 h-auto flex-col space-y-2"
+              onClick={onUpdateLocation}
+            >
               <MapPin className="h-6 w-6" />
               <div>Update Location</div>
             </Button>

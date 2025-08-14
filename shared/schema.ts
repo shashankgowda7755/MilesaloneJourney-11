@@ -22,6 +22,7 @@ export const blogPosts = pgTable("blog_posts", {
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
   readingTime: integer("reading_time").notNull(),
   isFeatured: boolean("is_featured").notNull().default(false),
+  isVisible: boolean("is_visible").notNull().default(true),
   publishedAt: timestamp("published_at").notNull().defaultNow(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -50,6 +51,7 @@ export const destinations = pgTable("destinations", {
   relatedBlogPosts: jsonb("related_blog_posts").$type<string[]>().notNull().default([]), // Array of blog post IDs
   isCurrentLocation: boolean("is_current_location").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),
+  isVisible: boolean("is_visible").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

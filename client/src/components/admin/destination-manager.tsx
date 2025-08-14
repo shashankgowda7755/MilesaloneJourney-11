@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Edit, Trash2, MapPin, Star } from "lucide-react";
@@ -31,10 +31,7 @@ export default function DestinationManager() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertDestination) => {
-      return apiRequest('/api/destinations', {
-        method: 'POST',
-        body: data,
-      });
+      return apiRequest('POST', '/api/destinations', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/destinations'] });
@@ -49,10 +46,7 @@ export default function DestinationManager() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<InsertDestination> }) => {
-      return apiRequest(`/api/destinations/${id}`, {
-        method: 'PUT',
-        body: data,
-      });
+      return apiRequest('PUT', `/api/destinations/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/destinations'] });
@@ -67,15 +61,26 @@ export default function DestinationManager() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/destinations/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/destinations/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/destinations'] });
       toast({
         title: "Success",
         description: "Destination deleted successfully",
+      });
+    },
+  });
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, isVisible }: { id: string; isVisible: boolean }) => {
+      return apiRequest('PUT', `/api/destinations/${id}`, { isVisible: !isVisible });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/destinations'] });
+      toast({
+        title: "Success",
+        description: "Destination visibility updated successfully",
       });
     },
   });
@@ -101,6 +106,7 @@ export default function DestinationManager() {
       difficulty: "Easy",
       isCurrentLocation: false,
       isFeatured: false,
+      isVisible: true,
     },
   });
 
@@ -149,8 +155,8 @@ export default function DestinationManager() {
     setEditingDestination(destination);
     editForm.reset({
       ...destination,
-      highlights: destination.highlights.join(', ') as any,
-      activities: destination.activities.join(', ') as any,
+      highlights: destination.highlights.join(', '),
+      activities: destination.activities.join(', '),
     });
   };
 
@@ -183,6 +189,9 @@ export default function DestinationManager() {
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add New Destination</DialogTitle>
+                <DialogDescription>
+                  Add a new destination to your travel journey. Fill in the details below.
+                </DialogDescription>
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -417,7 +426,11 @@ export default function DestinationManager() {
                       <FormItem>
                         <FormLabel>Highlights (comma separated)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Beautiful views, Historic sites, Local culture" {...field} />
+                          <Input 
+                            placeholder="Beautiful views, Historic sites, Local culture" 
+                            value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -430,12 +443,54 @@ export default function DestinationManager() {
                       <FormItem>
                         <FormLabel>Activities (comma separated)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Trekking, Photography, Local food tasting" {...field} />
+                          <Input 
+                            placeholder="Trekking, Photography, Local food tasting" 
+                            value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="isFeatured"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <input 
+                              type="checkbox" 
+                              checked={field.value}
+                              onChange={field.onChange}
+                              className="rounded"
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">Featured Destination</FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="isVisible"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <input 
+                              type="checkbox" 
+                              checked={field.value}
+                              onChange={field.onChange}
+                              className="rounded"
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">Visible</FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <div className="flex justify-end space-x-2">
                     <Button 
                       type="button" 
@@ -503,6 +558,15 @@ export default function DestinationManager() {
                   <Button
                     size="sm"
                     variant="outline"
+                    onClick={() => toggleVisibilityMutation.mutate({ id: destination.id, isVisible: destination.isVisible ?? true })}
+                    data-testid={`toggle-visibility-destination-${destination.id}`}
+                    title={destination.isVisible ? 'Hide destination' : 'Show destination'}
+                  >
+                    {destination.isVisible ? '👁️' : '🙈'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => openEditDialog(destination)}
                     data-testid={`edit-destination-${destination.id}`}
                   >
@@ -532,6 +596,338 @@ export default function DestinationManager() {
           )}
         </div>
       </CardContent>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingDestination} onOpenChange={() => setEditingDestination(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Destination</DialogTitle>
+            <DialogDescription>
+              Update the destination details below.
+            </DialogDescription>
+          </DialogHeader>
+          {editingDestination && (
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit(onUpdate)} className="space-y-4">
+                <FormField
+                  control={editForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter destination name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Brief description of the destination" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="detailedDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Detailed Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Comprehensive description of the destination" 
+                          className="min-h-[100px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editForm.control}
+                    name="region"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Region</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select region" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {regions.map((region) => (
+                              <SelectItem key={region} value={region}>
+                                {region}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={editForm.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter state name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="featuredImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Featured Image URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="coordinates.lat"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Latitude</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="any"
+                            placeholder="28.6139" 
+                            {...field} 
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editForm.control}
+                    name="coordinates.lng"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Longitude</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="any"
+                            placeholder="77.2090" 
+                            {...field} 
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="bestTimeToVisit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Best Time to Visit</FormLabel>
+                        <FormControl>
+                          <Input placeholder="October to March" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editForm.control}
+                    name="recommendedStay"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Recommended Stay</FormLabel>
+                        <FormControl>
+                          <Input placeholder="2-3 days" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="budgetRange"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Budget Range</FormLabel>
+                        <FormControl>
+                          <Input placeholder="₹1000-2000 per day" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editForm.control}
+                    name="difficulty"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Difficulty</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select difficulty" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {difficulties.map((difficulty) => (
+                              <SelectItem key={difficulty} value={difficulty}>
+                                {difficulty}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={editForm.control}
+                  name="highlights"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Highlights (comma separated)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Beautiful views, Historic sites, Local culture" 
+                          value={typeof field.value === 'string' ? field.value : field.value?.join(', ') || ''}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="activities"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Activities (comma separated)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Trekking, Photography, Local food tasting" 
+                          value={typeof field.value === 'string' ? field.value : field.value?.join(', ') || ''}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="isFeatured"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <input 
+                            type="checkbox" 
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="rounded"
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">Featured Destination</FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editForm.control}
+                    name="isVisible"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <input 
+                            type="checkbox" 
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="rounded"
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">Visible</FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setEditingDestination(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="bg-brand-green text-white hover:bg-brand-green/90"
+                    disabled={updateMutation.isPending}
+                  >
+                    {updateMutation.isPending ? 'Updating...' : 'Update Destination'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

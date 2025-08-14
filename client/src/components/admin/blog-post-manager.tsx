@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Edit, Trash2, Eye, Calendar } from "lucide-react";
@@ -29,10 +29,7 @@ export default function BlogPostManager() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertBlogPost) => {
-      return apiRequest('/api/blog-posts', {
-        method: 'POST',
-        body: data,
-      });
+      return apiRequest('POST', '/api/blog-posts', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/blog-posts'] });
@@ -47,10 +44,7 @@ export default function BlogPostManager() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<InsertBlogPost> }) => {
-      return apiRequest(`/api/blog-posts/${id}`, {
-        method: 'PUT',
-        body: data,
-      });
+      return apiRequest('PUT', `/api/blog-posts/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/blog-posts'] });
@@ -65,15 +59,26 @@ export default function BlogPostManager() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/blog-posts/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/blog-posts/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/blog-posts'] });
       toast({
         title: "Success",
         description: "Blog post deleted successfully",
+      });
+    },
+  });
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, isVisible }: { id: string; isVisible: boolean }) => {
+      return apiRequest('PUT', `/api/blog-posts/${id}`, { isVisible: !isVisible });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/blog-posts'] });
+      toast({
+        title: "Success",
+        description: "Blog post visibility updated successfully",
       });
     },
   });
@@ -90,6 +95,7 @@ export default function BlogPostManager() {
       tags: [],
       readingTime: 5,
       isFeatured: false,
+      isVisible: true,
       publishedAt: new Date(),
     },
   });
@@ -123,7 +129,7 @@ export default function BlogPostManager() {
     setEditingPost(post);
     editForm.reset({
       ...post,
-      tags: post.tags.join(', ') as any,
+      tags: post.tags.join(', '),
     });
   };
 
@@ -156,6 +162,9 @@ export default function BlogPostManager() {
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create New Blog Post</DialogTitle>
+                <DialogDescription>
+                  Create a new blog post for your travel journey. Fill in the details below.
+                </DialogDescription>
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -265,12 +274,54 @@ export default function BlogPostManager() {
                       <FormItem>
                         <FormLabel>Tags (comma separated)</FormLabel>
                         <FormControl>
-                          <Input placeholder="travel, adventure, culture" {...field} />
+                          <Input 
+                            placeholder="travel, adventure, culture" 
+                            value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="isFeatured"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <input 
+                              type="checkbox" 
+                              checked={field.value}
+                              onChange={field.onChange}
+                              className="rounded"
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">Featured Post</FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="isVisible"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <input 
+                              type="checkbox" 
+                              checked={field.value}
+                              onChange={field.onChange}
+                              className="rounded"
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">Visible</FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <div className="flex justify-end space-x-2">
                     <Button 
                       type="button" 
@@ -330,8 +381,18 @@ export default function BlogPostManager() {
                     variant="outline"
                     onClick={() => window.open(`/letters/${post.slug}`, '_blank')}
                     data-testid={`view-blog-post-${post.id}`}
+                    title="View post"
                   >
                     <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => toggleVisibilityMutation.mutate({ id: post.id, isVisible: post.isVisible ?? true })}
+                    data-testid={`toggle-visibility-blog-post-${post.id}`}
+                    title={post.isVisible ? 'Hide post' : 'Show post'}
+                  >
+                    {post.isVisible ? '👁️' : '🙈'}
                   </Button>
                   <Button
                     size="sm"
@@ -371,6 +432,9 @@ export default function BlogPostManager() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Blog Post</DialogTitle>
+            <DialogDescription>
+              Update the blog post details below.
+            </DialogDescription>
           </DialogHeader>
           {editingPost && (
             <Form {...editForm}>
@@ -481,12 +545,54 @@ export default function BlogPostManager() {
                     <FormItem>
                       <FormLabel>Tags (comma separated)</FormLabel>
                       <FormControl>
-                        <Input placeholder="travel, adventure, culture" {...field} />
+                        <Input 
+                          placeholder="travel, adventure, culture" 
+                          value={typeof field.value === 'string' ? field.value : field.value?.join(', ') || ''}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="isFeatured"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <input 
+                            type="checkbox" 
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="rounded"
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">Featured Post</FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editForm.control}
+                    name="isVisible"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <input 
+                            type="checkbox" 
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="rounded"
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">Visible</FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <div className="flex justify-end space-x-2">
                   <Button 
                     type="button" 

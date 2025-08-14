@@ -202,7 +202,36 @@ export default function Admin() {
           </TabsList>
 
           <TabsContent value="dashboard" className="mt-6">
-            <AdminDashboard />
+            <AdminDashboard 
+              onNewPost={() => {
+                // Switch to posts tab and trigger create
+                const tabsTrigger = document.querySelector('[value="posts"]') as HTMLElement;
+                tabsTrigger?.click();
+                setTimeout(() => {
+                  const createButton = document.querySelector('[data-testid="create-blog-post-button"]') as HTMLElement;
+                  createButton?.click();
+                }, 100);
+              }}
+              onAddDestination={() => {
+                // Switch to destinations tab and trigger create
+                const tabsTrigger = document.querySelector('[value="destinations"]') as HTMLElement;
+                tabsTrigger?.click();
+                setTimeout(() => {
+                  const createButton = document.querySelector('[data-testid="create-destination-button"]') as HTMLElement;
+                  createButton?.click();
+                }, 100);
+              }}
+              onUploadPhotos={() => {
+                // Switch to gallery tab
+                const tabsTrigger = document.querySelector('[value="gallery"]') as HTMLElement;
+                tabsTrigger?.click();
+              }}
+              onUpdateLocation={() => {
+                // Switch to destinations tab
+                const tabsTrigger = document.querySelector('[value="destinations"]') as HTMLElement;
+                tabsTrigger?.click();
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="posts" className="mt-6">
