@@ -17,6 +17,7 @@ import MessageManager from "@/components/admin/message-manager";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -35,13 +36,13 @@ export default function Admin() {
 
   // Login mutation
   const loginMutation = useMutation({
-    mutationFn: async (password: string) => {
+    mutationFn: async ({ username, password }: { username: string; password: string }) => {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
       
       if (!response.ok) {
@@ -70,8 +71,8 @@ export default function Admin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.trim()) {
-      loginMutation.mutate(password);
+    if (username.trim() && password.trim()) {
+      loginMutation.mutate({ username, password });
     }
   };
 
@@ -79,6 +80,7 @@ export default function Admin() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       setIsAuthenticated(false);
+      setUsername("");
       setPassword("");
       queryClient.clear();
       toast({
@@ -100,19 +102,31 @@ export default function Admin() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-brand-cream flex items-center justify-center p-4" data-testid="admin-login">
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center p-4" data-testid="user-login">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <Lock className="mx-auto text-brand-orange text-4xl mb-4" />
             <CardTitle className="font-playfair text-2xl font-bold text-brand-brown">
-              Admin Access
+              Login
             </CardTitle>
             <p className="text-gray-600">
-              Enter the password to access the admin dashboard
+              Sign in to your account
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your username"
+                  disabled={loginMutation.isPending}
+                  data-testid="username-input"
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
@@ -120,7 +134,7 @@ export default function Admin() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter admin password"
+                  placeholder="Enter your password"
                   disabled={loginMutation.isPending}
                   data-testid="password-input"
                 />
@@ -128,10 +142,10 @@ export default function Admin() {
               <Button 
                 type="submit"
                 className="w-full bg-brand-brown text-white hover:bg-brand-brown/90"
-                disabled={loginMutation.isPending || !password.trim()}
+                disabled={loginMutation.isPending || !username.trim() || !password.trim()}
                 data-testid="login-button"
               >
-                {loginMutation.isPending ? "Logging in..." : "Login"}
+                {loginMutation.isPending ? "Signing in..." : "Sign In"}
               </Button>
               <div className="text-center">
                 <Button 

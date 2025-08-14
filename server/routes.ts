@@ -336,24 +336,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Simple password authentication
+  // Simple username and password authentication
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { password } = req.body;
+      const { username, password } = req.body;
       
-      // Simple password check
-      if (password === "123456") {
+      // Simple username and password check
+      if (username === "admin" && password === "123456") {
         // Store user session
         req.session = req.session || {};
         (req.session as any).user = {
           id: "admin",
           name: "Administrator",
-          email: "admin@travel-blog.com"
+          email: "admin@travel-blog.com",
+          username: "admin"
         };
         
         res.json({ success: true, message: "Login successful" });
       } else {
-        res.status(401).json({ success: false, message: "Invalid password" });
+        res.status(401).json({ success: false, message: "Invalid username or password" });
       }
     } catch (error) {
       console.error("Error during login:", error);
