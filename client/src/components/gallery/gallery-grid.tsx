@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Image, Camera } from "lucide-react";
+import { Play, Image, Camera, Share2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
-import DetailedSocialShare from "@/components/detailed-social-share";
 import type { GalleryCollectionWithMedia } from "@shared/schema";
 
 interface GalleryGridProps {
@@ -96,31 +95,43 @@ export default function GalleryGrid({ searchQuery = "" }: GalleryGridProps) {
                     )}
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-500" data-testid="collection-location">
                       {collection.location}
                     </div>
-                    <Button 
-                      size="sm"
-                      variant="outline"
-                      className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
-                      data-testid={`collection-view-button-${collection.id}`}
-                    >
-                      <Camera className="w-4 h-4 mr-2" />
-                      View Collection
-                    </Button>
-                  </div>
-                  
-                  {/* Detailed Social Sharing */}
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <DetailedSocialShare
-                      title={collection.title}
-                      description={collection.description}
-                      url={`${window.location.origin}/gallery/${collection.id}`}
-                      hashtags={[]}
-                      type="blog"
-                      youtubeUrl={collection.youtubeUrl || undefined}
-                    />
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+                        data-testid={`collection-view-button-${collection.id}`}
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        View Collection
+                      </Button>
+                      <Button 
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const shareUrl = `${window.location.origin}/gallery/${collection.id}`;
+                          if (navigator.share) {
+                            navigator.share({
+                              title: collection.title,
+                              text: collection.description,
+                              url: shareUrl,
+                            });
+                          } else {
+                            navigator.clipboard.writeText(shareUrl);
+                          }
+                        }}
+                        className="text-gray-500 hover:text-brand-orange"
+                        data-testid={`gallery-card-share-${collection.id}`}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
