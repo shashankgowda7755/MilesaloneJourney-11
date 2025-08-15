@@ -66,6 +66,14 @@ export default function TravelPinsManager() {
         description: "Travel pin created successfully!",
       });
     },
+    onError: (error: any) => {
+      console.error('Create pin error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create travel pin. Please check all fields.",
+        variant: "destructive",
+      });
+    },
   });
 
   const updateMutation = useMutation({
@@ -80,6 +88,14 @@ export default function TravelPinsManager() {
       toast({
         title: "Success",
         description: "Travel pin updated successfully!",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Update pin error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update travel pin. Please check all fields.",
+        variant: "destructive",
       });
     },
   });
@@ -99,7 +115,7 @@ export default function TravelPinsManager() {
 
   const toggleVisibilityMutation = useMutation({
     mutationFn: async ({ id, isVisible }: { id: string, isVisible: boolean }) => {
-      return apiRequest(`/api/travel-pins/${id}`, 'PUT', { isVisible: !isVisible });
+      return apiRequest('PUT', `/api/travel-pins/${id}`, { isVisible: !isVisible });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/travel-pins'] });
@@ -107,10 +123,25 @@ export default function TravelPinsManager() {
   });
 
   const onSubmit = (data: z.infer<typeof travelPinFormSchema>) => {
+    // Validate coordinates to prevent NaN values
+    if (isNaN(data.coordinates.lat) || isNaN(data.coordinates.lng)) {
+      toast({
+        title: "Invalid Coordinates",
+        description: "Please enter valid latitude and longitude values.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const pinData: InsertTravelPin = {
       ...data,
       visitedDate: data.visitedDate ? new Date(data.visitedDate) : undefined,
+      // Ensure arrays are properly formatted
+      images: Array.isArray(data.images) ? data.images : [],
+      tags: Array.isArray(data.tags) ? data.tags : [],
     };
+
+    console.log('Submitting pin data:', pinData); // Debug log
 
     if (editingPin) {
       updateMutation.mutate({ id: editingPin.id, data: pinData });
@@ -268,7 +299,11 @@ export default function TravelPinsManager() {
                             step="any" 
                             placeholder="e.g., 48.8584"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const parsedValue = value === '' ? 0 : parseFloat(value);
+                              field.onChange(isNaN(parsedValue) ? 0 : parsedValue);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -287,7 +322,11 @@ export default function TravelPinsManager() {
                             step="any" 
                             placeholder="e.g., 2.2945"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const parsedValue = value === '' ? 0 : parseFloat(value);
+                              field.onChange(isNaN(parsedValue) ? 0 : parsedValue);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -326,7 +365,10 @@ export default function TravelPinsManager() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Rating</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                        <Select onValueChange={(value) => {
+                          const parsedValue = parseInt(value);
+                          field.onChange(isNaN(parsedValue) ? 0 : parsedValue);
+                        }} defaultValue={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Rate 1-5" />
