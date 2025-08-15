@@ -60,6 +60,8 @@ Preferred communication style: Simple, everyday language.
 - **Newsletter Integration**: Email subscription system for journey updates
 - **Mobile Optimization**: Bottom navigation and mobile-first responsive design with touch-friendly interfaces
 - **Performance**: Image optimization, query caching, and efficient state management with lazy loading
+- **Social Media Integration**: Comprehensive social media sharing and content linking across all travel content including blog posts, destinations, travel pins, and journey updates with support for Instagram, Twitter, Facebook, YouTube, and custom hashtag management
+- **Travel Pins Management**: Admin interface for creating and managing travel pins with coordinates, ratings, notes, and social media integration
 
 ### Development and Deployment
 - **Build Process**: Vite for frontend bundling, esbuild for server bundling

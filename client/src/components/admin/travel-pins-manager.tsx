@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertTravelPinSchema, type TravelPin, type InsertTravelPin } from "@shared/schema";
 import { z } from "zod";
+import SocialMediaIntegration from "@/components/social-media-integration";
 
 const travelPinFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -34,6 +35,11 @@ const travelPinFormSchema = z.object({
   rating: z.number().int().min(0).max(5),
   notes: z.string().optional(),
   isVisible: z.boolean(),
+  instagramPostUrl: z.string().optional(),
+  twitterPostUrl: z.string().optional(),
+  facebookPostUrl: z.string().optional(),
+  youtubeVideoUrl: z.string().optional(),
+  socialMediaHashtags: z.array(z.string()),
 });
 
 export default function TravelPinsManager() {
@@ -61,6 +67,11 @@ export default function TravelPinsManager() {
       rating: 0,
       notes: "",
       isVisible: true,
+      instagramPostUrl: "",
+      twitterPostUrl: "",
+      facebookPostUrl: "",
+      youtubeVideoUrl: "",
+      socialMediaHashtags: [],
     },
   });
 
@@ -177,6 +188,21 @@ export default function TravelPinsManager() {
     if (data.notes && data.notes.trim() !== "") {
       pinData.notes = data.notes;
     }
+    if (data.instagramPostUrl && data.instagramPostUrl.trim() !== "") {
+      pinData.instagramPostUrl = data.instagramPostUrl;
+    }
+    if (data.twitterPostUrl && data.twitterPostUrl.trim() !== "") {
+      pinData.twitterPostUrl = data.twitterPostUrl;
+    }
+    if (data.facebookPostUrl && data.facebookPostUrl.trim() !== "") {
+      pinData.facebookPostUrl = data.facebookPostUrl;
+    }
+    if (data.youtubeVideoUrl && data.youtubeVideoUrl.trim() !== "") {
+      pinData.youtubeVideoUrl = data.youtubeVideoUrl;
+    }
+    if (data.socialMediaHashtags && data.socialMediaHashtags.length > 0) {
+      pinData.socialMediaHashtags = data.socialMediaHashtags;
+    }
 
     console.log('Transformed pin data:', pinData); // Debug log
 
@@ -203,6 +229,11 @@ export default function TravelPinsManager() {
       notes: pin.notes || "",
       isVisible: pin.isVisible,
       visitedDate: pin.visitedDate ? new Date(pin.visitedDate).toISOString().split('T')[0] : "",
+      instagramPostUrl: pin.instagramPostUrl || "",
+      twitterPostUrl: pin.twitterPostUrl || "",
+      facebookPostUrl: pin.facebookPostUrl || "",
+      youtubeVideoUrl: pin.youtubeVideoUrl || "",
+      socialMediaHashtags: pin.socialMediaHashtags || [],
     });
     setIsDialogOpen(true);
   };
@@ -460,6 +491,29 @@ export default function TravelPinsManager() {
                     </FormItem>
                   )}
                 />
+
+                {/* Social Media Integration */}
+                <div className="space-y-4">
+                  <SocialMediaIntegration
+                    data={{
+                      instagramPostUrl: form.watch('instagramPostUrl'),
+                      twitterPostUrl: form.watch('twitterPostUrl'), 
+                      facebookPostUrl: form.watch('facebookPostUrl'),
+                      youtubeVideoUrl: form.watch('youtubeVideoUrl'),
+                      socialMediaHashtags: form.watch('socialMediaHashtags')
+                    }}
+                    onUpdate={(data) => {
+                      if (data.instagramPostUrl !== undefined) form.setValue('instagramPostUrl', data.instagramPostUrl);
+                      if (data.twitterPostUrl !== undefined) form.setValue('twitterPostUrl', data.twitterPostUrl);
+                      if (data.facebookPostUrl !== undefined) form.setValue('facebookPostUrl', data.facebookPostUrl);
+                      if (data.youtubeVideoUrl !== undefined) form.setValue('youtubeVideoUrl', data.youtubeVideoUrl);
+                      if (data.socialMediaHashtags !== undefined) form.setValue('socialMediaHashtags', data.socialMediaHashtags);
+                    }}
+                    title={form.watch('name') || 'Travel Pin'}
+                    description={form.watch('description') || ''}
+                    type="travel-pin"
+                  />
+                </div>
 
                 <div className="flex justify-end space-x-2">
                   <Button

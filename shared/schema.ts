@@ -23,6 +23,12 @@ export const blogPosts = pgTable("blog_posts", {
   readingTime: integer("reading_time").notNull(),
   isFeatured: boolean("is_featured").notNull().default(false),
   isVisible: boolean("is_visible").notNull().default(true),
+  // Social media integration
+  instagramPostUrl: text("instagram_post_url"),
+  twitterPostUrl: text("twitter_post_url"),
+  facebookPostUrl: text("facebook_post_url"),
+  youtubeVideoUrl: text("youtube_video_url"),
+  socialMediaHashtags: jsonb("social_media_hashtags").$type<string[]>().notNull().default([]),
   publishedAt: timestamp("published_at").notNull().defaultNow(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -52,6 +58,12 @@ export const destinations = pgTable("destinations", {
   isCurrentLocation: boolean("is_current_location").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),
   isVisible: boolean("is_visible").notNull().default(true),
+  // Social media integration
+  instagramPostUrl: text("instagram_post_url"),
+  twitterPostUrl: text("twitter_post_url"),
+  facebookPostUrl: text("facebook_post_url"),
+  youtubeVideoUrl: text("youtube_video_url"),
+  socialMediaHashtags: jsonb("social_media_hashtags").$type<string[]>().notNull().default([]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -113,6 +125,11 @@ export const journeyTracking = pgTable("journey_tracking", {
   daysTraveled: integer("days_traveled").notNull().default(0),
   statesCovered: integer("states_covered").notNull().default(0),
   distanceCovered: integer("distance_covered").notNull().default(0), // kilometers
+  // Social media integration for journey updates
+  instagramStoryUrl: text("instagram_story_url"),
+  instagramReelUrl: text("instagram_reel_url"),
+  twitterUpdateUrl: text("twitter_update_url"),
+  youtubeShortUrl: text("youtube_short_url"),
   lastUpdated: timestamp("last_updated").notNull().defaultNow(),
 });
 
@@ -131,6 +148,12 @@ export const travelPins = pgTable("travel_pins", {
   rating: integer("rating").default(0), // 1-5 stars
   notes: text("notes"),
   isVisible: boolean("is_visible").notNull().default(true),
+  // Social media integration
+  instagramPostUrl: text("instagram_post_url"),
+  twitterPostUrl: text("twitter_post_url"),
+  facebookPostUrl: text("facebook_post_url"),
+  youtubeVideoUrl: text("youtube_video_url"),
+  socialMediaHashtags: jsonb("social_media_hashtags").$type<string[]>().notNull().default([]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
