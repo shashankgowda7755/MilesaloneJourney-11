@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { BlogPost as BlogPostType } from "@shared/schema";
+import SocialMediaDisplay from "@/components/social-media-display";
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
@@ -140,7 +141,7 @@ export default function BlogPost() {
             </div>
           )}
 
-          {/* Share Button */}
+          {/* Social Sharing */}
           <div className="flex justify-end">
             <Button 
               variant="outline" 
@@ -175,6 +176,22 @@ export default function BlogPost() {
                      prose-blockquote:border-l-4 prose-blockquote:border-brand-orange prose-blockquote:pl-4
                      prose-blockquote:italic prose-blockquote:text-gray-600"
             dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
+          />
+        </div>
+
+        {/* Social Media Integration */}
+        <div className="mt-12">
+          <SocialMediaDisplay
+            data={{
+              instagramPostUrl: post.instagramPostUrl || undefined,
+              twitterPostUrl: post.twitterPostUrl || undefined,
+              facebookPostUrl: post.facebookPostUrl || undefined,
+              youtubeVideoUrl: post.youtubeVideoUrl || undefined,
+              socialMediaHashtags: post.socialMediaHashtags || undefined
+            }}
+            title="Follow this story on social media"
+            compact={false}
+            showHashtags={true}
           />
         </div>
 

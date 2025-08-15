@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DestinationDetailDialog from "./destination-detail-dialog";
 import SocialMediaDisplay from "@/components/social-media-display";
+import DestinationCardShare from "./destination-card-share";
 import type { Destination } from "@shared/schema";
 
 interface DestinationCardProps {
@@ -147,6 +148,12 @@ export default function DestinationCard({ destination }: DestinationCardProps) {
               <Images className="w-4 h-4 mr-1" />
               Photos
             </Button>
+          </div>
+          
+          {/* Quick Share Button */}
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm text-gray-500">Share this destination:</span>
+            <DestinationCardShare destination={destination} />
           </div>
 
           {/* Social Media Sharing */}

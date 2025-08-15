@@ -3,6 +3,7 @@ import { Clock, Calendar, Images, BookOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import BlogCardShare from "./blog-card-share";
 import type { BlogPost } from "@shared/schema";
 
 interface BlogCardProps {
@@ -78,16 +79,19 @@ export default function BlogCard({ post }: BlogCardProps) {
               <BookOpen className="w-4 h-4 mr-2" />
               <span className="font-medium">Read Story</span>
             </div>
-            <Button 
-              variant="outline"
-              size="sm"
-              className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
-              data-testid="blog-card-view-gallery"
-              onClick={handleViewGallery}
-            >
-              <Images className="w-4 h-4 mr-1" />
-              View Photos
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline"
+                size="sm"
+                className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+                data-testid="blog-card-view-gallery"
+                onClick={handleViewGallery}
+              >
+                <Images className="w-4 h-4 mr-1" />
+                View Photos
+              </Button>
+              <BlogCardShare post={post} />
+            </div>
           </div>
         </CardContent>
       </Card>
