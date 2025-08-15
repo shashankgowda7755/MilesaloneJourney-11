@@ -28,12 +28,15 @@ export default function DestinationMap({ destination }: DestinationMapProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Map placeholder - In production this would be a real map */}
-          <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center border-2 border-dashed border-gray-300">
-            <div className="text-center text-gray-500">
-              <MapPin className="w-8 h-8 mx-auto mb-2" />
-              <p className="text-sm">Interactive Map</p>
-              <p className="text-xs">Coordinates: {destination.coordinates.lat}, {destination.coordinates.lng}</p>
+          {/* Interactive Map Preview */}
+          <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-lg h-64 flex items-center justify-center border border-brand-orange/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(59,130,246,0.1),transparent),radial-gradient(circle_at_70%_30%,rgba(34,197,94,0.1),transparent)]"></div>
+            <div className="text-center text-brand-brown relative z-10">
+              <MapPin className="w-12 h-12 mx-auto mb-3 text-brand-orange" />
+              <p className="text-lg font-semibold mb-1">Location Preview</p>
+              <p className="text-sm text-gray-600 mb-2">{destination.name}</p>
+              <p className="text-xs text-gray-500">Coordinates: {destination.coordinates.lat}, {destination.coordinates.lng}</p>
+              <p className="text-xs text-brand-orange mt-2 font-medium">Click "View in Maps" for interactive navigation</p>
             </div>
           </div>
           
