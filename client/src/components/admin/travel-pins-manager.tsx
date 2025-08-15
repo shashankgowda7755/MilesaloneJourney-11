@@ -55,7 +55,7 @@ export default function TravelPinsManager() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertTravelPin) => {
-      return apiRequest('/api/travel-pins', 'POST', data);
+      return apiRequest('POST', '/api/travel-pins', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/travel-pins'] });
@@ -70,7 +70,7 @@ export default function TravelPinsManager() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: Partial<InsertTravelPin> }) => {
-      return apiRequest(`/api/travel-pins/${id}`, 'PUT', data);
+      return apiRequest('PUT', `/api/travel-pins/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/travel-pins'] });
@@ -86,7 +86,7 @@ export default function TravelPinsManager() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/travel-pins/${id}`, 'DELETE');
+      return apiRequest('DELETE', `/api/travel-pins/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/travel-pins'] });
@@ -220,7 +220,7 @@ export default function TravelPinsManager() {
                       <FormItem>
                         <FormLabel>City</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Paris" {...field} />
+                          <Input placeholder="e.g., Paris" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -248,7 +248,7 @@ export default function TravelPinsManager() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Describe your experience..." {...field} />
+                        <Textarea placeholder="Describe your experience..." {...field} value={field.value || ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -367,7 +367,7 @@ export default function TravelPinsManager() {
                     <FormItem>
                       <FormLabel>Personal Notes</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Your personal memories and notes..." {...field} />
+                        <Textarea placeholder="Your personal memories and notes..." {...field} value={field.value || ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
