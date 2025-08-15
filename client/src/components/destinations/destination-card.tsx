@@ -150,9 +150,12 @@ export default function DestinationCard({ destination }: DestinationCardProps) {
             </Button>
           </div>
           
-          {/* Quick Share Button */}
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-gray-500">Share this destination:</span>
+          {/* Action Row with Share */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center text-brand-orange">
+              <MapPin className="w-4 h-4 mr-2" />
+              <span className="font-medium text-sm">View Destination</span>
+            </div>
             <DestinationCardShare destination={destination} />
           </div>
 
