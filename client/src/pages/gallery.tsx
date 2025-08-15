@@ -10,6 +10,7 @@ import GalleryGrid from "@/components/gallery/gallery-grid";
 import Lightbox from "@/components/gallery/lightbox";
 import YouTubePlayer from "@/components/gallery/youtube-player";
 import SocialMediaDisplay from "@/components/social-media-display";
+import DetailedSocialShare from "@/components/detailed-social-share";
 import { useState } from "react";
 import type { GalleryCollectionWithMedia } from "@shared/schema";
 
@@ -166,6 +167,19 @@ export default function Gallery() {
           </p>
         </div>
 
+        {/* Detailed Social Sharing */}
+        <div className="mb-12">
+          <DetailedSocialShare
+            title={collection.title}
+            description={collection.description}
+            url={window.location.href}
+            hashtags={[]}
+            type="blog"
+            instagramUrl={(collection as any).instagramPostUrl || undefined}
+            youtubeUrl={(collection as any).youtubeVideoUrl || collection.youtubeUrl || undefined}
+          />
+        </div>
+
         {/* Social Media Sharing */}
         <div className="mb-12">
           <SocialMediaDisplay
@@ -176,7 +190,7 @@ export default function Gallery() {
               youtubeVideoUrl: (collection as any).youtubeVideoUrl || collection.youtubeUrl || undefined,
               socialMediaHashtags: (collection as any).socialMediaHashtags || undefined
             }}
-            title="Share this gallery"
+            title="Follow this gallery on social media"
             compact={false}
             showHashtags={true}
           />

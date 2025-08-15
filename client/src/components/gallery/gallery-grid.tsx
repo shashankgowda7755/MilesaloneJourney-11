@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Image, Camera } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
+import DetailedSocialShare from "@/components/detailed-social-share";
 import type { GalleryCollectionWithMedia } from "@shared/schema";
 
 interface GalleryGridProps {
@@ -95,7 +96,7 @@ export default function GalleryGrid({ searchQuery = "" }: GalleryGridProps) {
                     )}
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="text-sm text-gray-500" data-testid="collection-location">
                       {collection.location}
                     </div>
@@ -108,6 +109,18 @@ export default function GalleryGrid({ searchQuery = "" }: GalleryGridProps) {
                       <Camera className="w-4 h-4 mr-2" />
                       View Collection
                     </Button>
+                  </div>
+                  
+                  {/* Detailed Social Sharing */}
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <DetailedSocialShare
+                      title={collection.title}
+                      description={collection.description}
+                      url={`${window.location.origin}/gallery/${collection.id}`}
+                      hashtags={[]}
+                      type="blog"
+                      youtubeUrl={collection.youtubeUrl || undefined}
+                    />
                   </div>
                 </CardContent>
               </Card>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import DestinationDetailDialog from "./destination-detail-dialog";
 import SocialMediaDisplay from "@/components/social-media-display";
 import DestinationCardShare from "./destination-card-share";
+import DetailedSocialShare from "@/components/detailed-social-share";
 import type { Destination } from "@shared/schema";
 
 interface DestinationCardProps {
@@ -150,27 +151,16 @@ export default function DestinationCard({ destination }: DestinationCardProps) {
             </Button>
           </div>
           
-          {/* Action Row with Share */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center text-brand-orange">
-              <MapPin className="w-4 h-4 mr-2" />
-              <span className="font-medium text-sm">View Destination</span>
-            </div>
-            <DestinationCardShare destination={destination} />
-          </div>
-
-          {/* Social Media Sharing */}
+          {/* Detailed Social Sharing */}
           <div onClick={(e) => e.stopPropagation()}>
-            <SocialMediaDisplay
-              data={{
-                instagramPostUrl: destination.instagramPostUrl || undefined,
-                twitterPostUrl: destination.twitterPostUrl || undefined,
-                facebookPostUrl: destination.facebookPostUrl || undefined,
-                youtubeVideoUrl: destination.youtubeVideoUrl || undefined,
-                socialMediaHashtags: destination.socialMediaHashtags || undefined
-              }}
-              compact={true}
-              showHashtags={true}
+            <DetailedSocialShare
+              title={destination.name}
+              description={destination.description}
+              url={`${window.location.origin}/journey/${destination.slug}`}
+              hashtags={destination.socialMediaHashtags || []}
+              type="destination"
+              instagramUrl={destination.instagramPostUrl || undefined}
+              youtubeUrl={destination.youtubeVideoUrl || undefined}
             />
           </div>
         </CardContent>
