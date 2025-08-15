@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DestinationMap from "@/components/destinations/destination-map";
 import RelatedContent from "@/components/destinations/related-content";
 import SocialMediaDisplay from "@/components/social-media-display";
+import DetailedSocialShare from "@/components/detailed-social-share";
 import { Destination } from "@shared/schema";
 
 export default function DestinationDetail() {
@@ -274,6 +275,19 @@ export default function DestinationDetail() {
               showHashtags={true}
             />
           </div>
+        </div>
+
+        {/* Detailed Social Sharing */}
+        <div className="mt-12 mb-8">
+          <DetailedSocialShare
+            title={destination.name}
+            description={destination.description}
+            url={window.location.href}
+            hashtags={destination.socialMediaHashtags || []}
+            type="destination"
+            instagramUrl={destination.instagramPostUrl || undefined}
+            youtubeUrl={destination.youtubeVideoUrl || undefined}
+          />
         </div>
 
         {/* Maps and Photos Section */}

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { BlogPost as BlogPostType } from "@shared/schema";
 import SocialMediaDisplay from "@/components/social-media-display";
+import DetailedSocialShare from "@/components/detailed-social-share";
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
@@ -179,8 +180,21 @@ export default function BlogPost() {
           />
         </div>
 
+        {/* Detailed Social Sharing */}
+        <div className="mt-12 mb-8">
+          <DetailedSocialShare
+            title={post.title}
+            description={post.excerpt}
+            url={window.location.href}
+            hashtags={[...(post.tags || []), ...(post.socialMediaHashtags || [])]}
+            type="blog"
+            instagramUrl={post.instagramPostUrl || undefined}
+            youtubeUrl={post.youtubeVideoUrl || undefined}
+          />
+        </div>
+
         {/* Social Media Integration */}
-        <div className="mt-12">
+        <div className="mt-8">
           <SocialMediaDisplay
             data={{
               instagramPostUrl: post.instagramPostUrl || undefined,

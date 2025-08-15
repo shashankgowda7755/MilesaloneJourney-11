@@ -1,0 +1,24 @@
+[build]
+  command = "npm run build"
+  functions = "netlify/functions"
+  publish = "client/dist"
+
+[build.environment]
+  NODE_ENV = "production"
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[functions]
+  external_node_modules = ["@neondatabase/serverless", "drizzle-orm"]
+
+[[plugins]]
+  package = "@netlify/plugin-functions-core"
