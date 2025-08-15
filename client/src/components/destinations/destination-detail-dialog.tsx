@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import DetailedSocialShare from "@/components/detailed-social-share";
 import type { Destination } from "@shared/schema";
 
 interface DestinationDetailDialogProps {
@@ -177,6 +178,21 @@ export default function DestinationDetailDialog({ destination, isOpen, onClose }
               <Camera className="w-4 h-4 mr-2" />
               View Gallery
             </Button>
+          </div>
+
+          <Separator />
+
+          {/* Detailed Social Sharing */}
+          <div className="pt-4">
+            <DetailedSocialShare
+              title={destination.name}
+              description={destination.description}
+              url={`${window.location.origin}/journey/${destination.slug}`}
+              hashtags={destination.socialMediaHashtags || []}
+              type="destination"
+              instagramUrl={destination.instagramPostUrl || undefined}
+              youtubeUrl={destination.youtubeVideoUrl || undefined}
+            />
           </div>
         </div>
       </DialogContent>
