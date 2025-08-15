@@ -19,21 +19,21 @@ import { z } from "zod";
 
 const travelPinFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional().or(z.literal("")),
+  description: z.string().optional(),
   country: z.string().min(1, "Country is required"),
-  city: z.string().optional().or(z.literal("")),
+  city: z.string().optional(),
   coordinates: z.object({
     lat: z.number().min(-90).max(90),
     lng: z.number().min(-180).max(180),
   }),
-  visitedDate: z.string().optional().or(z.literal("")),
-  pinType: z.enum(['visited', 'current', 'planned', 'favorite']).default('visited'),
-  pinColor: z.string().default('#E07A3E'),
-  images: z.array(z.string()).default([]),
-  tags: z.array(z.string()).default([]),
-  rating: z.number().int().min(0).max(5).default(0),
-  notes: z.string().optional().or(z.literal("")),
-  isVisible: z.boolean().default(true),
+  visitedDate: z.string().optional(),
+  pinType: z.enum(['visited', 'current', 'planned', 'favorite']),
+  pinColor: z.string(),
+  images: z.array(z.string()),
+  tags: z.array(z.string()),
+  rating: z.number().int().min(0).max(5),
+  notes: z.string().optional(),
+  isVisible: z.boolean(),
 });
 
 export default function TravelPinsManager() {
@@ -146,25 +146,37 @@ export default function TravelPinsManager() {
       return;
     }
 
-    // Transform data to match the backend schema
-    const pinData: InsertTravelPin = {
+    // Transform data to match the backend schema - only include defined values
+    const pinData: any = {
       name: data.name,
-      description: data.description || null,
       country: data.country,
-      city: data.city || null,
       coordinates: {
         lat: data.coordinates.lat,
         lng: data.coordinates.lng
       },
-      visitedDate: data.visitedDate && data.visitedDate !== "" ? new Date(data.visitedDate) : null,
       pinType: data.pinType,
       pinColor: data.pinColor,
       images: data.images || [],
       tags: data.tags || [],
-      rating: data.rating || null,
-      notes: data.notes || null,
       isVisible: data.isVisible
     };
+
+    // Only add optional fields if they have values
+    if (data.description && data.description.trim() !== "") {
+      pinData.description = data.description;
+    }
+    if (data.city && data.city.trim() !== "") {
+      pinData.city = data.city;
+    }
+    if (data.visitedDate && data.visitedDate !== "") {
+      pinData.visitedDate = new Date(data.visitedDate);
+    }
+    if (data.rating && data.rating > 0) {
+      pinData.rating = data.rating;
+    }
+    if (data.notes && data.notes.trim() !== "") {
+      pinData.notes = data.notes;
+    }
 
     console.log('Transformed pin data:', pinData); // Debug log
 
