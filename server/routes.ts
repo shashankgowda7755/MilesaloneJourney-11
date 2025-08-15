@@ -283,7 +283,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/travel-pins', async (req, res) => {
     try {
-      const result = insertTravelPinSchema.safeParse(req.body);
+      // Handle date string conversion before validation
+      const data = { ...req.body };
+      if (data.visitedDate && typeof data.visitedDate === 'string') {
+        data.visitedDate = new Date(data.visitedDate);
+      }
+
+      const result = insertTravelPinSchema.safeParse(data);
       if (!result.success) {
         return res.status(400).json({ error: 'Invalid travel pin data', details: result.error });
       }
@@ -298,7 +304,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/travel-pins/:id', async (req, res) => {
     try {
-      const result = insertTravelPinSchema.partial().safeParse(req.body);
+      // Handle date string conversion before validation
+      const data = { ...req.body };
+      if (data.visitedDate && typeof data.visitedDate === 'string') {
+        data.visitedDate = new Date(data.visitedDate);
+      }
+
+      const result = insertTravelPinSchema.partial().safeParse(data);
       if (!result.success) {
         return res.status(400).json({ error: 'Invalid travel pin data', details: result.error });
       }

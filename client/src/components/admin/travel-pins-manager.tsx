@@ -169,7 +169,7 @@ export default function TravelPinsManager() {
       pinData.city = data.city;
     }
     if (data.visitedDate && data.visitedDate !== "") {
-      pinData.visitedDate = new Date(data.visitedDate);
+      pinData.visitedDate = data.visitedDate; // Send as string, backend will convert
     }
     if (data.rating && data.rating > 0) {
       pinData.rating = data.rating;
