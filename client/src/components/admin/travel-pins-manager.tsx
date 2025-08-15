@@ -17,12 +17,23 @@ import { apiRequest } from "@/lib/queryClient";
 import { insertTravelPinSchema, type TravelPin, type InsertTravelPin } from "@shared/schema";
 import { z } from "zod";
 
-const travelPinFormSchema = insertTravelPinSchema.extend({
-  visitedDate: z.string().optional(),
+const travelPinFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional().or(z.literal("")),
+  country: z.string().min(1, "Country is required"),
+  city: z.string().optional().or(z.literal("")),
   coordinates: z.object({
-    lat: z.number(),
-    lng: z.number(),
+    lat: z.number().min(-90).max(90),
+    lng: z.number().min(-180).max(180),
   }),
+  visitedDate: z.string().optional().or(z.literal("")),
+  pinType: z.enum(['visited', 'current', 'planned', 'favorite']).default('visited'),
+  pinColor: z.string().default('#E07A3E'),
+  images: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]),
+  rating: z.number().int().min(0).max(5).default(0),
+  notes: z.string().optional().or(z.literal("")),
+  isVisible: z.boolean().default(true),
 });
 
 export default function TravelPinsManager() {
@@ -123,6 +134,8 @@ export default function TravelPinsManager() {
   });
 
   const onSubmit = (data: z.infer<typeof travelPinFormSchema>) => {
+    console.log('Form submission data:', data); // Debug log
+
     // Validate coordinates to prevent NaN values
     if (isNaN(data.coordinates.lat) || isNaN(data.coordinates.lng)) {
       toast({
@@ -133,15 +146,27 @@ export default function TravelPinsManager() {
       return;
     }
 
+    // Transform data to match the backend schema
     const pinData: InsertTravelPin = {
-      ...data,
-      visitedDate: data.visitedDate ? new Date(data.visitedDate) : undefined,
-      // Ensure arrays are properly formatted
-      images: Array.isArray(data.images) ? data.images : [],
-      tags: Array.isArray(data.tags) ? data.tags : [],
+      name: data.name,
+      description: data.description || null,
+      country: data.country,
+      city: data.city || null,
+      coordinates: {
+        lat: data.coordinates.lat,
+        lng: data.coordinates.lng
+      },
+      visitedDate: data.visitedDate && data.visitedDate !== "" ? new Date(data.visitedDate) : null,
+      pinType: data.pinType,
+      pinColor: data.pinColor,
+      images: data.images || [],
+      tags: data.tags || [],
+      rating: data.rating || null,
+      notes: data.notes || null,
+      isVisible: data.isVisible
     };
 
-    console.log('Submitting pin data:', pinData); // Debug log
+    console.log('Transformed pin data:', pinData); // Debug log
 
     if (editingPin) {
       updateMutation.mutate({ id: editingPin.id, data: pinData });
@@ -298,10 +323,14 @@ export default function TravelPinsManager() {
                             type="number" 
                             step="any" 
                             placeholder="e.g., 48.8584"
-                            {...field}
+                            value={field.value || ''}
                             onChange={(e) => {
                               const value = e.target.value;
-                              const parsedValue = value === '' ? 0 : parseFloat(value);
+                              if (value === '') {
+                                field.onChange(0);
+                                return;
+                              }
+                              const parsedValue = parseFloat(value);
                               field.onChange(isNaN(parsedValue) ? 0 : parsedValue);
                             }}
                           />
@@ -321,10 +350,14 @@ export default function TravelPinsManager() {
                             type="number" 
                             step="any" 
                             placeholder="e.g., 2.2945"
-                            {...field}
+                            value={field.value || ''}
                             onChange={(e) => {
                               const value = e.target.value;
-                              const parsedValue = value === '' ? 0 : parseFloat(value);
+                              if (value === '') {
+                                field.onChange(0);
+                                return;
+                              }
+                              const parsedValue = parseFloat(value);
                               field.onChange(isNaN(parsedValue) ? 0 : parsedValue);
                             }}
                           />
