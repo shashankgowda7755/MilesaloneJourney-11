@@ -9,6 +9,7 @@ import {
   insertNewsletterSubscriberSchema,
   insertContactMessageSchema,
   insertJourneyTrackingSchema,
+  insertTravelPinSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -253,6 +254,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating journey tracking:", error);
       res.status(500).json({ message: "Failed to update journey tracking" });
+    }
+  });
+
+  // Travel pins
+  app.get('/api/travel-pins', async (req, res) => {
+    try {
+      const pins = await storage.getTravelPins();
+      res.json(pins);
+    } catch (error) {
+      console.error('Error fetching travel pins:', error);
+      res.status(500).json({ error: 'Failed to get travel pins' });
+    }
+  });
+
+  app.get('/api/travel-pins/:id', async (req, res) => {
+    try {
+      const pin = await storage.getTravelPin(req.params.id);
+      if (!pin) {
+        return res.status(404).json({ error: 'Travel pin not found' });
+      }
+      res.json(pin);
+    } catch (error) {
+      console.error('Error fetching travel pin:', error);
+      res.status(500).json({ error: 'Failed to get travel pin' });
+    }
+  });
+
+  app.post('/api/travel-pins', async (req, res) => {
+    try {
+      const result = insertTravelPinSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: 'Invalid travel pin data', details: result.error });
+      }
+      
+      const pin = await storage.createTravelPin(result.data);
+      res.status(201).json(pin);
+    } catch (error) {
+      console.error('Error creating travel pin:', error);
+      res.status(500).json({ error: 'Failed to create travel pin' });
+    }
+  });
+
+  app.put('/api/travel-pins/:id', async (req, res) => {
+    try {
+      const result = insertTravelPinSchema.partial().safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: 'Invalid travel pin data', details: result.error });
+      }
+      
+      const pin = await storage.updateTravelPin(req.params.id, result.data);
+      if (!pin) {
+        return res.status(404).json({ error: 'Travel pin not found' });
+      }
+      res.json(pin);
+    } catch (error) {
+      console.error('Error updating travel pin:', error);
+      res.status(500).json({ error: 'Failed to update travel pin' });
+    }
+  });
+
+  app.delete('/api/travel-pins/:id', async (req, res) => {
+    try {
+      const deleted = await storage.deleteTravelPin(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: 'Travel pin not found' });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting travel pin:', error);
+      res.status(500).json({ error: 'Failed to delete travel pin' });
     }
   });
 

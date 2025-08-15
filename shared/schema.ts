@@ -116,6 +116,25 @@ export const journeyTracking = pgTable("journey_tracking", {
   lastUpdated: timestamp("last_updated").notNull().defaultNow(),
 });
 
+export const travelPins = pgTable("travel_pins", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  coordinates: jsonb("coordinates").$type<{lat: number, lng: number}>().notNull(),
+  country: text("country").notNull(),
+  city: text("city"),
+  visitedDate: timestamp("visited_date"),
+  pinType: text("pin_type").$type<'visited' | 'current' | 'planned' | 'favorite'>().notNull().default('visited'),
+  pinColor: text("pin_color").notNull().default('#E07A3E'), // Brand orange as default
+  images: text("images").array().default([]),
+  tags: text("tags").array().default([]),
+  rating: integer("rating").default(0), // 1-5 stars
+  notes: text("notes"),
+  isVisible: boolean("is_visible").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Create insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -163,6 +182,12 @@ export const insertJourneyTrackingSchema = createInsertSchema(journeyTracking).o
   lastUpdated: true,
 });
 
+export const insertTravelPinSchema = createInsertSchema(travelPins).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -187,6 +212,9 @@ export type ContactMessage = typeof contactMessages.$inferSelect;
 
 export type InsertJourneyTracking = z.infer<typeof insertJourneyTrackingSchema>;
 export type JourneyTracking = typeof journeyTracking.$inferSelect;
+
+export type InsertTravelPin = z.infer<typeof insertTravelPinSchema>;
+export type TravelPin = typeof travelPins.$inferSelect;
 
 // Extended types with relations
 export type GalleryCollectionWithMedia = GalleryCollection & {

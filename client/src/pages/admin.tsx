@@ -12,6 +12,7 @@ import AdminStats from "@/components/admin/admin-stats";
 import AdminDashboard from "@/components/admin/admin-dashboard";
 import BlogPostManager from "@/components/admin/blog-post-manager";
 import DestinationManager from "@/components/admin/destination-manager";
+import TravelPinsManager from "@/components/admin/travel-pins-manager";
 import GalleryManager from "@/components/admin/gallery-manager";
 import MessageManager from "@/components/admin/message-manager";
 
@@ -197,6 +198,7 @@ export default function Admin() {
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="posts">Blog Posts</TabsTrigger>
             <TabsTrigger value="destinations">Destinations</TabsTrigger>
+            <TabsTrigger value="travel-pins">Travel Map</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
           </TabsList>
@@ -279,6 +281,10 @@ export default function Admin() {
 
           <TabsContent value="destinations" className="mt-6">
             <DestinationManager />
+          </TabsContent>
+
+          <TabsContent value="travel-pins" className="mt-6">
+            <TravelPinsManager />
           </TabsContent>
 
           <TabsContent value="gallery" className="mt-6">

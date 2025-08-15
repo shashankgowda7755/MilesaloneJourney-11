@@ -16,6 +16,8 @@ import {
   type InsertContactMessage,
   type JourneyTracking,
   type InsertJourneyTracking,
+  type TravelPin,
+  type InsertTravelPin,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -62,6 +64,13 @@ export interface IStorage {
   // Journey Tracking
   getJourneyTracking(): Promise<JourneyTracking | undefined>;
   updateJourneyTracking(tracking: InsertJourneyTracking): Promise<JourneyTracking>;
+
+  // Travel Pins
+  getTravelPins(): Promise<TravelPin[]>;
+  getTravelPin(id: string): Promise<TravelPin | undefined>;
+  createTravelPin(pin: InsertTravelPin): Promise<TravelPin>;
+  updateTravelPin(id: string, pin: Partial<InsertTravelPin>): Promise<TravelPin | undefined>;
+  deleteTravelPin(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -73,6 +82,7 @@ export class MemStorage implements IStorage {
   private newsletterSubscribers: Map<string, NewsletterSubscriber> = new Map();
   private contactMessages: Map<string, ContactMessage> = new Map();
   private journeyTracking: JourneyTracking | undefined;
+  private travelPins: Map<string, TravelPin> = new Map();
 
   constructor() {
     this.initializeDefaultData();
@@ -175,6 +185,74 @@ export class MemStorage implements IStorage {
       distanceCovered: 1950,
       lastUpdated: new Date(),
     };
+
+    // Initialize sample travel pins
+    const travelPinsData: InsertTravelPin[] = [
+      {
+        name: "Kashmir Valley",
+        description: "Beautiful valley surrounded by mountains",
+        country: "India",
+        city: "Srinagar",
+        coordinates: { lat: 34.0837, lng: 74.7973 },
+        pinType: "visited",
+        pinColor: "#E07A3E",
+        visitedDate: new Date("2024-01-15"),
+        rating: 5,
+        notes: "Absolutely stunning place with amazing houseboats",
+        isVisible: true,
+      },
+      {
+        name: "Golden Temple",
+        description: "Sacred Sikh gurdwara in Amritsar",
+        country: "India",
+        city: "Amritsar",
+        coordinates: { lat: 31.6200, lng: 74.8765 },
+        pinType: "visited",
+        pinColor: "#FFD700",
+        visitedDate: new Date("2024-02-10"),
+        rating: 5,
+        notes: "Spiritual and peaceful experience",
+        isVisible: true,
+      },
+      {
+        name: "Mysuru Palace",
+        description: "Current location - magnificent royal palace",
+        country: "India",
+        city: "Mysuru",
+        coordinates: { lat: 12.2958, lng: 76.6394 },
+        pinType: "current",
+        pinColor: "#FF6B6B",
+        visitedDate: new Date("2024-03-20"),
+        rating: 5,
+        notes: "Currently exploring this cultural capital",
+        isVisible: true,
+      },
+      {
+        name: "Kanyakumari",
+        description: "Southernmost tip of India - planned destination",
+        country: "India",
+        city: "Kanyakumari",
+        coordinates: { lat: 8.0883, lng: 77.5385 },
+        pinType: "planned",
+        pinColor: "#9B59B6",
+        rating: 0,
+        notes: "Final destination of the journey",
+        isVisible: true,
+      },
+    ];
+
+    travelPinsData.forEach((pinData) => {
+      const id = randomUUID();
+      const pin: TravelPin = {
+        ...pinData,
+        id,
+        images: pinData.images || [],
+        tags: pinData.tags || [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.travelPins.set(id, pin);
+    });
 
     // Initialize destinations
     const destinationsData: InsertDestination[] = [
@@ -892,6 +970,50 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
       lastUpdated: new Date(),
     };
     return this.journeyTracking;
+  }
+
+  // Travel Pins
+  async getTravelPins(): Promise<TravelPin[]> {
+    return Array.from(this.travelPins.values())
+      .filter(pin => pin.isVisible)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getTravelPin(id: string): Promise<TravelPin | undefined> {
+    return this.travelPins.get(id);
+  }
+
+  async createTravelPin(insertPin: InsertTravelPin): Promise<TravelPin> {
+    const id = randomUUID();
+    const pin: TravelPin = {
+      ...insertPin,
+      id,
+      images: insertPin.images || [],
+      tags: insertPin.tags || [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.travelPins.set(id, pin);
+    return pin;
+  }
+
+  async updateTravelPin(id: string, updates: Partial<InsertTravelPin>): Promise<TravelPin | undefined> {
+    const pin = this.travelPins.get(id);
+    if (!pin) return undefined;
+
+    const updatedPin: TravelPin = {
+      ...pin,
+      ...updates,
+      id, // Ensure ID doesn't change
+      updatedAt: new Date(),
+    };
+    
+    this.travelPins.set(id, updatedPin);
+    return updatedPin;
+  }
+
+  async deleteTravelPin(id: string): Promise<boolean> {
+    return this.travelPins.delete(id);
   }
 }
 
