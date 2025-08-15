@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DestinationDetailDialog from "./destination-detail-dialog";
+import SocialMediaDisplay from "@/components/social-media-display";
 import type { Destination } from "@shared/schema";
 
 interface DestinationCardProps {
@@ -113,7 +114,7 @@ export default function DestinationCard({ destination }: DestinationCardProps) {
             ))}
           </div>
           
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 mb-4">
             <Button 
               className="bg-brand-orange text-white hover:bg-brand-orange/90"
               size="sm"
@@ -146,6 +147,21 @@ export default function DestinationCard({ destination }: DestinationCardProps) {
               <Images className="w-4 h-4 mr-1" />
               Photos
             </Button>
+          </div>
+
+          {/* Social Media Sharing */}
+          <div onClick={(e) => e.stopPropagation()}>
+            <SocialMediaDisplay
+              data={{
+                instagramPostUrl: destination.instagramPostUrl || undefined,
+                twitterPostUrl: destination.twitterPostUrl || undefined,
+                facebookPostUrl: destination.facebookPostUrl || undefined,
+                youtubeVideoUrl: destination.youtubeVideoUrl || undefined,
+                socialMediaHashtags: destination.socialMediaHashtags || undefined
+              }}
+              compact={true}
+              showHashtags={true}
+            />
           </div>
         </CardContent>
       </Card>

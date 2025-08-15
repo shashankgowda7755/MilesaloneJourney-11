@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DestinationMap from "@/components/destinations/destination-map";
 import RelatedContent from "@/components/destinations/related-content";
+import SocialMediaDisplay from "@/components/social-media-display";
 import { Destination } from "@shared/schema";
 
 export default function DestinationDetail() {
@@ -258,6 +259,20 @@ export default function DestinationDetail() {
 
             {/* Enhanced Map Component */}
             <DestinationMap destination={destination} />
+
+            {/* Social Media Integration */}
+            <SocialMediaDisplay
+              data={{
+                instagramPostUrl: destination.instagramPostUrl || undefined,
+                twitterPostUrl: destination.twitterPostUrl || undefined,
+                facebookPostUrl: destination.facebookPostUrl || undefined,
+                youtubeVideoUrl: destination.youtubeVideoUrl || undefined,
+                socialMediaHashtags: destination.socialMediaHashtags || undefined
+              }}
+              title="Share this destination"
+              compact={false}
+              showHashtags={true}
+            />
           </div>
         </div>
 

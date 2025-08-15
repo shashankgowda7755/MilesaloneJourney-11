@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import GalleryGrid from "@/components/gallery/gallery-grid";
 import Lightbox from "@/components/gallery/lightbox";
 import YouTubePlayer from "@/components/gallery/youtube-player";
+import SocialMediaDisplay from "@/components/social-media-display";
 import { useState } from "react";
 import type { GalleryCollectionWithMedia } from "@shared/schema";
 
@@ -163,6 +164,22 @@ export default function Gallery() {
           <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
             {collection.description}
           </p>
+        </div>
+
+        {/* Social Media Sharing */}
+        <div className="mb-12">
+          <SocialMediaDisplay
+            data={{
+              instagramPostUrl: (collection as any).instagramPostUrl || undefined,
+              twitterPostUrl: (collection as any).twitterPostUrl || undefined,
+              facebookPostUrl: (collection as any).facebookPostUrl || undefined,
+              youtubeVideoUrl: (collection as any).youtubeVideoUrl || collection.youtubeUrl || undefined,
+              socialMediaHashtags: (collection as any).socialMediaHashtags || undefined
+            }}
+            title="Share this gallery"
+            compact={false}
+            showHashtags={true}
+          />
         </div>
 
         {/* YouTube Video Section */}
