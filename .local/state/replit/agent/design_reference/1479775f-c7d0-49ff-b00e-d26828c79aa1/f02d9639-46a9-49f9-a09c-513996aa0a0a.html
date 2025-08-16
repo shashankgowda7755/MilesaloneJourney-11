@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milesalone - Raw Roads, Real Discovery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-orange': '#E07A3E',
+                        'brand-brown': '#634B3A',
+                        'brand-cream': '#F5F1E8',
+                        'brand-green': '#4F7942',
+                    },
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(96, 75, 58, 0.7), rgba(224, 122, 62, 0.5));
+        }
+        .card-hover {
+            transition: all 0.3s ease-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .leaflet-container {
+            border-radius: 16px;
+        }
+        .mobile-nav-active {
+            background-color: #E07A3E;
+            color: white;
+            border-radius: 50%;
+        }
+        .admin-hidden { display: none; }
+        .admin-visible { display: block; }
+        @media (max-width: 768px) {
+            .mobile-bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 50;
+                background: white;
+                border-top: 1px solid #E5E7EB;
+                padding: 8px 0;
+            }
+            body { padding-bottom: 80px; }
+        }
+    </style>
+</head>
+<body class="bg-brand-cream font-inter">
+    <!-- Desktop Header -->
+    <header class="hidden lg:block bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <nav class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-mountain text-brand-orange text-2xl"></i>
+                    <span class="font-playfair text-2xl font-bold text-brand-brown">Milesalone</span>
+                </div>
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="#home" class="text-brand-brown hover:text-brand-orange transition-colors font-medium">Home</a>
+                    <a href="#journey" class="text-brand-brown hover:text-brand-orange transition-colors font-medium">Journey</a>
+                    <a href="#letters" class="text-brand-brown hover:text-brand-orange transition-colors font-medium">Letters</a>
+                    <a href="#gallery" class="text-brand-brown hover:text-brand-orange transition-colors font-medium">Gallery</a>
+                    <a href="#about" class="text-brand-brown hover:text-brand-orange transition-colors font-medium">About</a>
+                    <button onclick="toggleAdminLogin()" class="bg-brand-orange text-white px-4 py-2 rounded-full font-medium hover:bg-opacity-90 transition-all">
+                        Admin
+                    </button>
+                </div>
+                <button class="lg:hidden text-brand-brown">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden bg-white shadow-sm sticky top-0 z-40">
+        <div class="flex items-center justify-between p-4">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-mountain text-brand-orange text-xl"></i>
+                <span class="font-playfair text-xl font-bold text-brand-brown">Milesalone</span>
+            </div>
+            <button onclick="toggleMobileMenu()" class="text-brand-brown">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Slide-out Menu -->
+    <div id="mobileMenu" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleMobileMenu()"></div>
+        <div class="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-out" id="mobileMenuPanel">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-mountain text-brand-orange text-xl"></i>
+                        <span class="font-playfair text-xl font-bold text-brand-brown">Milesalone</span>
+                    </div>
+                    <button onclick="toggleMobileMenu()" class="text-brand-brown">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <nav class="space-y-6">
+                    <a href="#home" onclick="toggleMobileMenu()" class="block text-brand-brown hover:text-brand-orange transition-colors font-medium text-lg">Home</a>
+                    <a href="#journey" onclick="toggleMobileMenu()" class="block text-brand-brown hover:text-brand-orange transition-colors font-medium text-lg">Journey</a>
+                    <a href="#letters" onclick="toggleMobileMenu()" class="block text-brand-brown hover:text-brand-orange transition-colors font-medium text-lg">Letters</a>
+                    <a href="#gallery" onclick="toggleMobileMenu()" class="block text-brand-brown hover:text-brand-orange transition-colors font-medium text-lg">Gallery</a>
+                    <a href="#about" onclick="toggleMobileMenu()" class="block text-brand-brown hover:text-brand-orange transition-colors font-medium text-lg">About</a>
+                    <button onclick="toggleAdminLogin(); toggleMobileMenu();" class="w-full bg-brand-orange text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-all">
+                        Admin Login
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="fixed inset-0 z-60 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-8">
+                <div class="text-center">
+                    <i class="fas fa-lock text-brand-orange text-4xl mb-4"></i>
+                    <h3 class="font-playfair text-2xl font-bold text-brand-brown mb-2">Admin Access</h3>
+                    <p class="text-gray-600 mb-6">Sign in with Google to access the admin dashboard</p>
+                    <button onclick="mockGoogleLogin()" class="w-full bg-white border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-full font-medium hover:bg-gray-50 transition-all flex items-center justify-center space-x-3 mb-4">
+                        <i class="fab fa-google text-red-500"></i>
+                        <span>Continue with Google</span>
+                    </button>
+                    <button onclick="toggleAdminLogin()" class="text-gray-500 hover:text-gray-700">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard (Hidden by default) -->
+    <div id="adminDashboard" class="admin-hidden">
+        <div class="bg-brand-brown text-white">
+            <div class="max-w-6xl mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-cog text-brand-orange"></i>
+                        <span class="font-playfair text-xl font-bold">Admin Dashboard</span>
+                    </div>
+                    <button onclick="toggleAdminMode()" class="bg-brand-orange text-white px-4 py-2 rounded-full font-medium hover:bg-opacity-90">
+                        Exit Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="max-w-6xl mx-auto px-6 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Total Posts</p>
+                            <p class="text-3xl font-bold text-brand-brown">24</p>
+                        </div>
+                        <i class="fas fa-pen-to-square text-brand-orange text-2xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Destinations</p>
+                            <p class="text-3xl font-bold text-brand-brown">18</p>
+                        </div>
+                        <i class="fas fa-map-marked-alt text-brand-orange text-2xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Gallery Items</p>
+                            <p class="text-3xl font-bold text-brand-brown">156</p>
+                        </div>
+                        <i class="fas fa-images text-brand-orange text-2xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Subscribers</p>
+                            <p class="text-3xl font-bold text-brand-brown">342</p>
+                        </div>
+                        <i class="fas fa-envelope text-brand-orange text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                        <h3 class="font-playfair text-xl font-bold text-brand-brown mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="bg-brand-orange text-white p-4 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                <i class="fas fa-plus mb-2 text-lg"></i>
+                                <div>New Post</div>
+                            </button>
+                            <button class="bg-brand-green text-white p-4 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                <i class="fas fa-map-pin mb-2 text-lg"></i>
+                                <div>Add Destination</div>
+                            </button>
+                            <button class="bg-blue-500 text-white p-4 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                <i class="fas fa-camera mb-2 text-lg"></i>
+                                <div>Upload Photos</div>
+                            </button>
+                            <button class="bg-purple-500 text-white p-4 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                <i class="fas fa-location-dot mb-2 text-lg"></i>
+                                <div>Update Location</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                        <h3 class="font-playfair text-xl font-bold text-brand-brown mb-4">Recent Activity</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-brand-orange rounded-full"></div>
+                                <div class="text-sm">
+                                    <p class="font-medium text-brand-brown">New blog post published</p>
+                                    <p class="text-gray-500">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-brand-green rounded-full"></div>
+                                <div class="text-sm">
+                                    <p class="font-medium text-brand-brown">Location updated to Mysuru</p>
+                                    <p class="text-gray-500">1 day ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <div class="text-sm">
+                                    <p class="font-medium text-brand-brown">Gallery collection added</p>
+                                    <p class="text-gray-500">3 days ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+        <!-- Hero Section -->
+        <section id="home" class="relative min-h-screen flex items-center justify-center">
+            <!-- Background with beautiful mountain landscape showing Kashmir valley -->
+            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80');">
+                <div class="hero-gradient absolute inset-0"></div>
+            </div>
+            
+            <div class="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
+                <h1 class="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
+                    Raw Roads,<br>
+                    <span class="text-brand-orange">Real Discovery</span>
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto">
+                    Join Shashank's authentic 4-month journey across India, from Kashmir's valleys to Kanyakumari's shores, on just ₹500 per day
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button onclick="scrollToSection('journey')" class="bg-brand-orange text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-map-marked-alt mr-2"></i>
+                        Explore Journey
+                    </button>
+                    <button onclick="scrollToSection('letters')" class="bg-white bg-opacity-20 backdrop-blur-sm text-white border-2 border-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-brand-brown transition-all duration-300">
+                        <i class="fas fa-book-open mr-2"></i>
+                        Read Diaries
+                    </button>
+                </div>
+                
+                <!-- Journey Stats -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-16 max-w-3xl mx-auto">
+                    <div class="text-center">
+                        <div class="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair">120</div>
+                        <div class="text-sm lg:text-base text-gray-200">Days Journey</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair">15+</div>
+                        <div class="text-sm lg:text-base text-gray-200">States Visited</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair">3000+</div>
+                        <div class="text-sm lg:text-base text-gray-200">Kilometers</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair">₹500</div>
+                        <div class="text-sm lg:text-base text-gray-200">Per Day Budget</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <i class="fas fa-chevron-down text-white text-2xl"></i>
+            </div>
+        </section>
+
+        <!-- Interactive Journey Map -->
+        <section class="py-16 lg:py-24 bg-white">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6">
+                        Live Journey Tracker
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Follow the real-time progress from the serene valleys of Kashmir to the southern tip of Kanyakumari. 
+                        Each pin tells a story of discovery, challenge, and authentic Indian experiences.
+                    </p>
+                </div>
+                
+                <div class="bg-gray-100 rounded-2xl p-8 mb-8">
+                    <div class="flex flex-col lg:flex-row items-center justify-between mb-6">
+                        <div class="mb-4 lg:mb-0">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <div class="w-4 h-4 bg-brand-orange rounded-full animate-pulse"></div>
+                                <span class="font-semibold text-brand-brown">Currently in: Mysuru, Karnataka</span>
+                            </div>
+                            <p class="text-gray-600">Exploring the royal heritage and palace architecture</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-brand-orange">65%</div>
+                            <div class="text-sm text-gray-600">Journey Complete</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Map Container -->
+                    <div id="map" class="h-96 lg:h-[500px] rounded-2xl shadow-lg"></div>
+                </div>
+                
+                <!-- Journey Progress -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-brand-cream rounded-2xl p-6 text-center">
+                        <i class="fas fa-flag text-brand-green text-3xl mb-4"></i>
+                        <h3 class="font-playfair text-xl font-bold text-brand-brown mb-2">Journey Started</h3>
+                        <p class="text-gray-600">August 1, 2025 - Srinagar, Kashmir</p>
+                        <p class="text-sm text-gray-500 mt-2">Dal Lake houseboats and mountain serenity</p>
+                    </div>
+                    <div class="bg-brand-orange bg-opacity-10 rounded-2xl p-6 text-center border-2 border-brand-orange">
+                        <i class="fas fa-map-pin text-brand-orange text-3xl mb-4"></i>
+                        <h3 class="font-playfair text-xl font-bold text-brand-brown mb-2">Current Location</h3>
+                        <p class="text-gray-600">Mysuru, Karnataka</p>
+                        <p class="text-sm text-gray-500 mt-2">Palace architecture and royal heritage</p>
+                    </div>
+                    <div class="bg-brand-cream rounded-2xl p-6 text-center">
+                        <i class="fas fa-flag-checkered text-brand-brown text-3xl mb-4"></i>
+                        <h3 class="font-playfair text-xl font-bold text-brand-brown mb-2">Final Destination</h3>
+                        <p class="text-gray-600">Kanyakumari, Tamil Nadu</p>
+                        <p class="text-sm text-gray-500 mt-2">Land's end where three seas meet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Blog Posts -->
+        <section id="letters" class="py-16 lg:py-24 bg-brand-cream">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6">
+                        Travel Letters
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Authentic stories from the road - the struggles, discoveries, and unexpected connections that make solo travel transformative.
+                    </p>
+                </div>
+
+                <!-- Blog Categories Filter -->
+                <div class="flex flex-wrap justify-center gap-4 mb-12">
+                    <button onclick="filterBlogPosts('all')" class="bg-brand-orange text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-all">
+                        All Stories
+                    </button>
+                    <button onclick="filterBlogPosts('adventure')" class="bg-white text-brand-brown px-6 py-3 rounded-full font-medium hover:bg-brand-orange hover:text-white transition-all">
+                        Adventure
+                    </button>
+                    <button onclick="filterBlogPosts('culture')" class="bg-white text-brand-brown px-6 py-3 rounded-full font-medium hover:bg-brand-orange hover:text-white transition-all">
+                        Culture
+                    </button>
+                    <button onclick="filterBlogPosts('food')" class="bg-white text-brand-brown px-6 py-3 rounded-full font-medium hover:bg-brand-orange hover:text-white transition-all">
+                        Food
+                    </button>
+                    <button onclick="filterBlogPosts('people')" class="bg-white text-brand-brown px-6 py-3 rounded-full font-medium hover:bg-brand-orange hover:text-white transition-all">
+                        People
+                    </button>
+                </div>
+
+                <!-- Blog Posts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="blogGrid">
+                    <!-- Featured Blog Post 1 -->
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover" data-category="adventure">
+                        <!-- Mountain trekking scene in Kashmir with dramatic clouds -->
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://pixabay.com/get/g43dfbb57d9827b77ed1fab64bb430cdbe3bad06405488dae798111f0222f7f37393dbf1ee23138a4b1778777746702cb19732cd8633ec56d9fe869f9ec33be3d_1280.jpg');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-brand-orange text-white px-3 py-1 rounded-full text-sm font-medium">Adventure</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-3">
+                                First Steps in Kashmir: Valley of Dreams
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                Stepping off the bus in Srinagar felt like entering another world. The crisp mountain air, the gentle lapping of Dal Lake, and the warm welcome from Ghulam sahib at the houseboat marked the beginning of an unforgettable journey.
+                            </p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span class="flex items-center">
+                                    <i class="far fa-clock mr-1"></i>
+                                    6 min read
+                                </span>
+                                <span>Aug 3, 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Featured Blog Post 2 -->
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover" data-category="culture">
+                        <!-- Traditional Indian village scene with local people -->
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=600');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-brand-green text-white px-3 py-1 rounded-full text-sm font-medium">Culture</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-3">
+                                Himachal's Hidden Villages: Time Stands Still
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                In the remote villages of Tirthan Valley, I discovered what India was like before modernization rushed in. Living with the Sharma family taught me about community, simplicity, and the forgotten art of slow living.
+                            </p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span class="flex items-center">
+                                    <i class="far fa-clock mr-1"></i>
+                                    8 min read
+                                </span>
+                                <span>Aug 18, 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Featured Blog Post 3 -->
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover" data-category="food">
+                        <!-- Colorful Indian street food scene with vendors -->
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1555126634-323283e090fa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=600');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">Food</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-3">
+                                Delhi Streets: A Culinary Adventure
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                From the legendary paranthas of Parathe Wali Gali to the hidden gems in Nizamuddin, Delhi's street food scene is a journey through history, culture, and incredible flavors that tell the story of India.
+                            </p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span class="flex items-center">
+                                    <i class="far fa-clock mr-1"></i>
+                                    5 min read
+                                </span>
+                                <span>Sep 2, 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Additional Blog Posts -->
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover" data-category="people">
+                        <!-- Portrait of friendly Indian local people smiling -->
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1534982841079-afde227ada8f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=600');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">People</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-3">
+                                The Bus Driver Who Changed My Journey
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                Sometimes the most profound moments come from unexpected encounters. Meet Rajesh, a bus driver from Jaipur whose philosophy on life and travel wisdom reshaped my entire approach to this journey.
+                            </p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span class="flex items-center">
+                                    <i class="far fa-clock mr-1"></i>
+                                    7 min read
+                                </span>
+                                <span>Sep 15, 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover" data-category="adventure">
+                        <!-- Desert landscape with sand dunes in Rajasthan -->
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=600');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-brand-orange text-white px-3 py-1 rounded-full text-sm font-medium">Adventure</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-3">
+                                Rajasthan Desert: Survival and Serenity
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                Three days in the Thar Desert with nothing but a camel, minimal water, and vast golden dunes. This experience pushed physical limits while revealing the profound silence and beauty of desert solitude.
+                            </p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span class="flex items-center">
+                                    <i class="far fa-clock mr-1"></i>
+                                    9 min read
+                                </span>
+                                <span>Sep 28, 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover" data-category="culture">
+                        <!-- Indian festival celebration with colors and people -->
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=600');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-brand-green text-white px-3 py-1 rounded-full text-sm font-medium">Culture</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-3">
+                                Goa Beyond Beaches: Heritage and Soul
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                While most see Goa as a beach destination, I discovered its Portuguese heritage, hidden churches, spice plantations, and a cultural blend that makes this tiny state uniquely Indian yet distinctly different.
+                            </p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span class="flex items-center">
+                                    <i class="far fa-clock mr-1"></i>
+                                    6 min read
+                                </span>
+                                <span>Oct 12, 2025</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="text-center mt-12">
+                    <button class="bg-brand-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Read All Stories
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Journey Destinations -->
+        <section id="journey" class="py-16 lg:py-24 bg-white">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6">
+                        Journey Through India
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Discover the destinations that shaped this incredible journey. From snow-capped mountains to tropical coastlines, each place offers unique experiences and authentic insights.
+                    </p>
+                </div>
+
+                <!-- Destination Filters -->
+                <div class="bg-brand-cream rounded-2xl p-6 mb-12">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <input type="text" placeholder="Search destinations..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors">
+                        </div>
+                        <div>
+                            <select class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors">
+                                <option>All Categories</option>
+                                <option>Mountain Destinations</option>
+                                <option>Historical Sites</option>
+                                <option>Cultural Hubs</option>
+                                <option>Beach Locations</option>
+                                <option>Adventure Spots</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors">
+                                <option>All Regions</option>
+                                <option>North India</option>
+                                <option>South India</option>
+                                <option>West India</option>
+                                <option>East India</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors">
+                                <option>Sort by: Newest</option>
+                                <option>Sort by: Popular</option>
+                                <option>Sort by: A-Z</option>
+                                <option>Sort by: Rating</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Destinations Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Destination 1: Srinagar -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Serene view of Dal Lake with houseboats and mountains -->
+                        <div class="relative h-56 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=700');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Mountain Destination</span>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <div class="flex items-center space-x-1 bg-white bg-opacity-90 rounded-full px-2 py-1">
+                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                    <span class="text-sm font-medium">4.9</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-playfair text-xl font-bold text-brand-brown">Srinagar, Kashmir</h3>
+                                <span class="text-sm text-gray-500">North India</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                The Venice of the East with its famous Dal Lake, floating gardens, and houseboat experiences. A perfect introduction to the beauty and tranquility of Kashmir valley.
+                            </p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-calendar-alt w-4 mr-2"></i>
+                                    Best time: April - October
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-clock w-4 mr-2"></i>
+                                    Recommended stay: 3-4 days
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-rupee-sign w-4 mr-2"></i>
+                                    Budget range: ₹1,500-3,000/day
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Houseboat Stay</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Shikara Rides</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Mughal Gardens</span>
+                            </div>
+                            <button class="w-full bg-brand-orange text-white py-3 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                View Destination Guide
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Destination 2: Jaipur -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Majestic view of Amber Fort with its golden walls -->
+                        <div class="relative h-56 bg-cover bg-center" style="background-image: url('https://pixabay.com/get/g2b88004fc8c56b72a7d497e53f37a6be4bbb2a357ac578054d5a99382d0845b8998d3065bdf04e2dd587b0aa39e06c915df08fa60afd8b1472cbdfdc87069fac_1280.jpg');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">Historical Site</span>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <div class="flex items-center space-x-1 bg-white bg-opacity-90 rounded-full px-2 py-1">
+                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                    <span class="text-sm font-medium">4.7</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-playfair text-xl font-bold text-brand-brown">Jaipur, Rajasthan</h3>
+                                <span class="text-sm text-gray-500">West India</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                The Pink City showcases royal Rajasthani architecture, vibrant bazaars, and magnificent palaces that transport you to India's regal past.
+                            </p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-calendar-alt w-4 mr-2"></i>
+                                    Best time: October - March
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-clock w-4 mr-2"></i>
+                                    Recommended stay: 2-3 days
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-rupee-sign w-4 mr-2"></i>
+                                    Budget range: ₹1,200-2,500/day
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Amber Fort</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">City Palace</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Local Bazaars</span>
+                            </div>
+                            <button class="w-full bg-brand-orange text-white py-3 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                View Destination Guide
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Destination 3: Goa -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Beautiful Goa beach with palm trees and golden sand -->
+                        <div class="relative h-56 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=700');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-cyan-500 text-white px-3 py-1 rounded-full text-sm font-medium">Beach Location</span>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <div class="flex items-center space-x-1 bg-white bg-opacity-90 rounded-full px-2 py-1">
+                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                    <span class="text-sm font-medium">4.6</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-playfair text-xl font-bold text-brand-brown">Goa Beaches</h3>
+                                <span class="text-sm text-gray-500">West India</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Beyond the party reputation, Goa offers Portuguese heritage, spice plantations, and a unique Indo-European cultural blend along pristine coastlines.
+                            </p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-calendar-alt w-4 mr-2"></i>
+                                    Best time: November - February
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-clock w-4 mr-2"></i>
+                                    Recommended stay: 4-5 days
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-rupee-sign w-4 mr-2"></i>
+                                    Budget range: ₹1,000-2,000/day
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Beach Life</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Portuguese Churches</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Spice Tours</span>
+                            </div>
+                            <button class="w-full bg-brand-orange text-white py-3 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                View Destination Guide
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Additional destinations would follow similar pattern -->
+                    <!-- Destination 4: Mysuru -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Mysore Palace illuminated in golden light -->
+                        <div class="relative h-56 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1582510003544-4d00b7f74220?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=700');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">Cultural Hub</span>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <div class="flex items-center space-x-1 bg-white bg-opacity-90 rounded-full px-2 py-1">
+                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                    <span class="text-sm font-medium">4.8</span>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-brand-orange text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                                    <i class="fas fa-map-pin mr-1"></i>
+                                    Current Location
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-playfair text-xl font-bold text-brand-brown">Mysuru, Karnataka</h3>
+                                <span class="text-sm text-gray-500">South India</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                The cultural capital of Karnataka, known for its magnificent palace, yoga heritage, silk production, and the famous Dasara festival celebrations.
+                            </p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-calendar-alt w-4 mr-2"></i>
+                                    Best time: October - March
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-clock w-4 mr-2"></i>
+                                    Recommended stay: 2-3 days
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-rupee-sign w-4 mr-2"></i>
+                                    Budget range: ₹800-1,800/day
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Mysore Palace</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Yoga Centers</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Chamundi Hills</span>
+                            </div>
+                            <button class="w-full bg-brand-orange text-white py-3 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                View Destination Guide
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Destination 5: Kerala Backwaters -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Peaceful Kerala backwaters with traditional houseboat -->
+                        <div class="relative h-56 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=700');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-teal-500 text-white px-3 py-1 rounded-full text-sm font-medium">Natural Wonder</span>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <div class="flex items-center space-x-1 bg-white bg-opacity-90 rounded-full px-2 py-1">
+                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                    <span class="text-sm font-medium">4.9</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-playfair text-xl font-bold text-brand-brown">Kerala Backwaters</h3>
+                                <span class="text-sm text-gray-500">South India</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                A network of interconnected canals, rivers, and lakes offering peaceful houseboat journeys through lush green landscapes and traditional village life.
+                            </p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-calendar-alt w-4 mr-2"></i>
+                                    Best time: September - March
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-clock w-4 mr-2"></i>
+                                    Recommended stay: 2-3 days
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-rupee-sign w-4 mr-2"></i>
+                                    Budget range: ₹1,500-3,500/day
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Houseboat Cruises</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Village Visits</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Ayurvedic Spas</span>
+                            </div>
+                            <button class="w-full bg-brand-orange text-white py-3 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                View Destination Guide
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Destination 6: Kanyakumari -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Dramatic view of Kanyakumari where three seas meet -->
+                        <div class="relative h-56 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=700');">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">Journey's End</span>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <div class="flex items-center space-x-1 bg-white bg-opacity-90 rounded-full px-2 py-1">
+                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                    <span class="text-sm font-medium">4.5</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-playfair text-xl font-bold text-brand-brown">Kanyakumari, Tamil Nadu</h3>
+                                <span class="text-sm text-gray-500">South India</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Land's End India, where the Arabian Sea, Bay of Bengal, and Indian Ocean meet. The ultimate destination offering spectacular sunrises and sunsets over the waters.
+                            </p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-calendar-alt w-4 mr-2"></i>
+                                    Best time: October - March
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-clock w-4 mr-2"></i>
+                                    Recommended stay: 1-2 days
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-rupee-sign w-4 mr-2"></i>
+                                    Budget range: ₹800-1,500/day
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Sunrise Point</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Vivekananda Memorial</span>
+                                <span class="bg-brand-cream text-brand-brown px-2 py-1 rounded-lg text-xs">Three Seas</span>
+                            </div>
+                            <button class="w-full bg-brand-orange text-white py-3 rounded-xl font-medium hover:bg-opacity-90 transition-all">
+                                View Destination Guide
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-12">
+                    <button class="bg-brand-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all">
+                        <i class="fas fa-map mr-2"></i>
+                        View All Destinations
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Gallery -->
+        <section id="gallery" class="py-16 lg:py-24 bg-brand-cream">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6">
+                        Visual Journey
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Every photograph tells a story of discovery, challenge, and the incredible diversity of landscapes, cultures, and moments that define authentic India travel.
+                    </p>
+                </div>
+
+                <!-- Gallery Collections -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Gallery Collection 1: Kashmir Adventures -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Stunning Kashmir mountain landscape with Dal Lake -->
+                        <div class="relative h-64 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=800');">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                            <div class="absolute bottom-4 left-4 text-white">
+                                <h3 class="font-playfair text-2xl font-bold mb-1">Kashmir Valley Adventures</h3>
+                                <p class="text-sm opacity-90">15 photos • 3 videos</p>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <button onclick="openGallery('kashmir')" class="bg-white bg-opacity-20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-opacity-30 transition-all">
+                                    <i class="fas fa-expand text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 mb-4">
+                                From the serene houseboats of Dal Lake to the challenging treks in Pahalgam, this collection captures the ethereal beauty and spiritual tranquility of Kashmir.
+                            </p>
+                            <!-- Photo thumbnails strip -->
+                            <div class="flex space-x-2 overflow-x-auto pb-2">
+                                <!-- Sunrise over Dal Lake with houseboats -->
+                                <img src="https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Dal Lake sunrise" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Traditional Kashmiri shikara boats -->
+                                <img src="https://pixabay.com/get/g28760123ad2edd4bd2f3ab71652a3d01cef6f0ec860f691d01fec7bfb0e80c2c94f872afa467dbe065685d8f9673a0b9ee4ee1c7cdab70b5ef541a4522c77bde_1280.jpg" alt="Shikara boats" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Mountain trekking path in Kashmir -->
+                                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Kashmir trekking" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Local Kashmiri vendor in market -->
+                                <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Kashmir market" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Collection 2: Desert Landscapes -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Vast Rajasthan desert with golden sand dunes -->
+                        <div class="relative h-64 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=800');">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                            <div class="absolute bottom-4 left-4 text-white">
+                                <h3 class="font-playfair text-2xl font-bold mb-1">Rajasthan Desert Life</h3>
+                                <p class="text-sm opacity-90">22 photos • 4 videos</p>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <button onclick="openGallery('rajasthan')" class="bg-white bg-opacity-20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-opacity-30 transition-all">
+                                    <i class="fas fa-expand text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 mb-4">
+                                The raw beauty of Thar Desert, camel safaris, nomadic communities, and the incredible resilience of life in one of India's most challenging landscapes.
+                            </p>
+                            <!-- Photo thumbnails strip -->
+                            <div class="flex space-x-2 overflow-x-auto pb-2">
+                                <!-- Camel caravan silhouettes at sunset -->
+                                <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Camel caravan" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Desert camp under starry sky -->
+                                <img src="https://pixabay.com/get/g183869114e693d40e93371a8a9419ae5f7ec4d242291cbe84b267667f5cbda490f9d01d249d39a598af8679b47e90118b1899830aadd0038c684989f91dc49d1_1280.jpg" alt="Desert camp" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Traditional Rajasthani folk musician -->
+                                <img src="https://images.unsplash.com/photo-1534982841079-afde227ada8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Folk musician" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Sand dunes with dramatic sky -->
+                                <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Sand dunes" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Collection 3: Cultural Encounters -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Vibrant Indian festival scene with colors -->
+                        <div class="relative h-64 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=800');">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                            <div class="absolute bottom-4 left-4 text-white">
+                                <h3 class="font-playfair text-2xl font-bold mb-1">Cultural Celebrations</h3>
+                                <p class="text-sm opacity-90">18 photos • 5 videos</p>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <button onclick="openGallery('culture')" class="bg-white bg-opacity-20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-opacity-30 transition-all">
+                                    <i class="fas fa-expand text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 mb-4">
+                                Festivals, ceremonies, traditional crafts, and the incredible diversity of Indian cultural expressions from different regions and communities.
+                            </p>
+                            <!-- Photo thumbnails strip -->
+                            <div class="flex space-x-2 overflow-x-auto pb-2">
+                                <!-- Colorful festival celebration -->
+                                <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Festival colors" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Traditional craftsman at work -->
+                                <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Traditional craft" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Temple ceremony -->
+                                <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Temple ceremony" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Local market scene -->
+                                <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Market scene" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Collection 4: Southern India -->
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
+                        <!-- Peaceful Kerala backwaters scene -->
+                        <div class="relative h-64 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&h=800');">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                            <div class="absolute bottom-4 left-4 text-white">
+                                <h3 class="font-playfair text-2xl font-bold mb-1">Southern Serenity</h3>
+                                <p class="text-sm opacity-90">25 photos • 6 videos</p>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <button onclick="openGallery('south')" class="bg-white bg-opacity-20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-opacity-30 transition-all">
+                                    <i class="fas fa-expand text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 mb-4">
+                                The lush landscapes of Kerala, ancient temples of Tamil Nadu, royal heritage of Karnataka, and the journey's culmination at India's southern tip.
+                            </p>
+                            <!-- Photo thumbnails strip -->
+                            <div class="flex space-x-2 overflow-x-auto pb-2">
+                                <!-- Kerala backwaters houseboat -->
+                                <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Kerala backwaters" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Mysore Palace illuminated -->
+                                <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Mysore Palace" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Kanyakumari sunrise point -->
+                                <img src="https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=100" alt="Kanyakumari sunrise" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                                <!-- Temple architecture detail -->
+                                <img src="https://pixabay.com/get/ge797de1a37de118994f633fae684ddc89236537f4532516dd45ae74436866f0c48a75c9d7a90dd09316298d421e3409a2a28577908954a9b09d46ed7d242e486_1280.jpg" alt="Temple architecture" class="w-20 h-12 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition-transform">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-12">
+                    <button class="bg-brand-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all">
+                        <i class="fas fa-images mr-2"></i>
+                        View Full Gallery
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Lightbox Modal -->
+        <div id="galleryLightbox" class="fixed inset-0 z-60 hidden">
+            <div class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
+                <div class="relative max-w-4xl max-h-screen p-4">
+                    <button onclick="closeGallery()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                    <button onclick="prevImage()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10">
+                        <i class="fas fa-chevron-left text-3xl"></i>
+                    </button>
+                    <button onclick="nextImage()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10">
+                        <i class="fas fa-chevron-right text-3xl"></i>
+                    </button>
+                    <div id="lightboxContent" class="flex items-center justify-center">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-center">
+                        <p id="imageCaption" class="mb-2"></p>
+                        <p id="imageCounter" class="text-sm opacity-75"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <section id="about" class="py-16 lg:py-24 bg-white">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <!-- Portrait photo of traveler with backpack in scenic location -->
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=1000" 
+                                 alt="Shashank with backpack in mountain setting" 
+                                 class="rounded-2xl shadow-2xl w-full h-auto object-cover">
+                            <div class="absolute -bottom-6 -right-6 bg-brand-orange text-white p-4 rounded-2xl shadow-lg">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold">65%</div>
+                                    <div class="text-sm">Complete</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6">
+                            About the Journey
+                        </h2>
+                        <p class="text-xl text-gray-600 mb-6">
+                            I'm Shashank, and this is my attempt to document the real India - not the Instagram-perfect version, but the authentic, challenging, beautiful, and transformative experience of traveling across this incredible country on a shoestring budget.
+                        </p>
+                        <p class="text-gray-600 mb-8">
+                            Starting from the serene valleys of Kashmir and heading to the southern tip of Kanyakumari, this 4-month journey covers over 3,000 kilometers, 15+ states, and countless stories of human connection, cultural discovery, and personal growth. All on a budget of just ₹500 per day.
+                        </p>
+
+                        <!-- Journey Details -->
+                        <div class="grid grid-cols-2 gap-6 mb-8">
+                            <div class="bg-brand-cream rounded-xl p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-calendar-alt text-brand-orange mr-3"></i>
+                                    <span class="font-semibold text-brand-brown">Duration</span>
+                                </div>
+                                <p class="text-gray-600">4 months (Aug - Nov 2025)</p>
+                            </div>
+                            <div class="bg-brand-cream rounded-xl p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-route text-brand-orange mr-3"></i>
+                                    <span class="font-semibold text-brand-brown">Distance</span>
+                                </div>
+                                <p class="text-gray-600">3,000+ kilometers</p>
+                            </div>
+                            <div class="bg-brand-cream rounded-xl p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-rupee-sign text-brand-orange mr-3"></i>
+                                    <span class="font-semibold text-brand-brown">Daily Budget</span>
+                                </div>
+                                <p class="text-gray-600">₹500 per day</p>
+                            </div>
+                            <div class="bg-brand-cream rounded-xl p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-backpack text-brand-orange mr-3"></i>
+                                    <span class="font-semibold text-brand-brown">Style</span>
+                                </div>
+                                <p class="text-gray-600">Solo backpacking</p>
+                            </div>
+                        </div>
+
+                        <!-- Travel Philosophy -->
+                        <div class="bg-brand-green bg-opacity-10 rounded-2xl p-6 mb-8">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-3">Travel Philosophy</h3>
+                            <p class="text-gray-600 italic">
+                                "Slow travel isn't just about taking your time - it's about being present, building genuine connections, and understanding that the journey changes you as much as you experience it."
+                            </p>
+                        </div>
+
+                        <!-- Contact and Support -->
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="mailto:hello@milesalone.com" class="bg-brand-orange text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-all text-center">
+                                <i class="fas fa-envelope mr-2"></i>
+                                Get in Touch
+                            </a>
+                            <button onclick="scrollToSection('newsletter')" class="bg-white border-2 border-brand-orange text-brand-orange px-6 py-3 rounded-full font-medium hover:bg-brand-orange hover:text-white transition-all">
+                                <i class="fas fa-bell mr-2"></i>
+                                Follow Journey
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section id="newsletter" class="py-16 lg:py-24 bg-brand-green">
+            <div class="max-w-4xl mx-auto px-6 text-center">
+                <h2 class="font-playfair text-3xl lg:text-5xl font-bold text-white mb-6">
+                    Join the Journey
+                </h2>
+                <p class="text-xl text-green-100 mb-12 max-w-2xl mx-auto">
+                    Get weekly updates about new destinations, travel stories, and behind-the-scenes insights from the road. No spam, just authentic travel content.
+                </p>
+
+                <form class="max-w-md mx-auto" onsubmit="subscribeNewsletter(event)">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input 
+                            type="email" 
+                            placeholder="Enter your email address" 
+                            required
+                            class="flex-1 px-6 py-4 rounded-full border-0 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-30 text-brand-brown"
+                        >
+                        <button 
+                            type="submit" 
+                            class="bg-brand-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all whitespace-nowrap"
+                        >
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Subscribe
+                        </button>
+                    </div>
+                    <p class="text-green-200 text-sm mt-4">
+                        <i class="fas fa-lock mr-1"></i>
+                        Your privacy is protected. Unsubscribe anytime.
+                    </p>
+                </form>
+
+                <!-- Social Proof -->
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-green-100">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white">342</div>
+                        <div class="text-sm">Newsletter Subscribers</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white">24</div>
+                        <div class="text-sm">Weekly Stories</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white">95%</div>
+                        <div class="text-sm">Read Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="py-16 lg:py-24 bg-brand-cream">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6">
+                        Get in Touch
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                        Have questions about the journey? Want to share your own travel experiences? Or maybe you have recommendations for upcoming destinations? I'd love to hear from you.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Contact Form -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <h3 class="font-playfair text-2xl font-bold text-brand-brown mb-6">Send a Message</h3>
+                        <form onsubmit="sendMessage(event)" class="space-y-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-brand-brown mb-2">Your Name</label>
+                                <input 
+                                    type="text" 
+                                    id="name" 
+                                    required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors"
+                                    placeholder="Enter your full name"
+                                >
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-brand-brown mb-2">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors"
+                                    placeholder="your.email@example.com"
+                                >
+                            </div>
+                            <div>
+                                <label for="subject" class="block text-sm font-medium text-brand-brown mb-2">Subject</label>
+                                <select 
+                                    id="subject" 
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors"
+                                >
+                                    <option>General Question</option>
+                                    <option>Travel Recommendation</option>
+                                    <option>Collaboration Inquiry</option>
+                                    <option>Technical Issue</option>
+                                    <option>Media/Press Inquiry</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-brand-brown mb-2">Message</label>
+                                <textarea 
+                                    id="message" 
+                                    rows="5" 
+                                    required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-orange focus:outline-none transition-colors resize-none"
+                                    placeholder="Share your thoughts, questions, or travel stories..."
+                                ></textarea>
+                            </div>
+                            <button 
+                                type="submit" 
+                                class="w-full bg-brand-orange text-white py-4 rounded-xl font-semibold hover:bg-opacity-90 transition-all"
+                            >
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="space-y-8">
+                        <div class="bg-white rounded-2xl p-8 shadow-lg">
+                            <h3 class="font-playfair text-2xl font-bold text-brand-brown mb-6">Connect Directly</h3>
+                            <div class="space-y-4">
+                                <a href="mailto:hello@milesalone.com" class="flex items-center text-gray-600 hover:text-brand-orange transition-colors">
+                                    <i class="fas fa-envelope text-brand-orange mr-4 text-xl"></i>
+                                    <div>
+                                        <div class="font-medium">Email</div>
+                                        <div>hello@milesalone.com</div>
+                                    </div>
+                                </a>
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-map-pin text-brand-orange mr-4 text-xl"></i>
+                                    <div>
+                                        <div class="font-medium">Current Location</div>
+                                        <div>Mysuru, Karnataka, India</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-clock text-brand-orange mr-4 text-xl"></i>
+                                    <div>
+                                        <div class="font-medium">Response Time</div>
+                                        <div>Usually within 24 hours</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Journey Status -->
+                        <div class="bg-brand-orange bg-opacity-10 rounded-2xl p-8 border-2 border-brand-orange">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-4">Journey Update</h3>
+                            <div class="flex items-center mb-3">
+                                <div class="w-3 h-3 bg-brand-orange rounded-full animate-pulse mr-3"></div>
+                                <span class="font-medium text-brand-brown">Currently in Mysuru</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Exploring the royal heritage and palace architecture. Next stop: Coimbatore for textile culture exploration.
+                            </p>
+                            <div class="text-sm text-gray-500">
+                                Last updated: 2 hours ago
+                            </div>
+                        </div>
+
+                        <!-- FAQ Quick Links -->
+                        <div class="bg-white rounded-2xl p-8 shadow-lg">
+                            <h3 class="font-playfair text-xl font-bold text-brand-brown mb-4">Quick Questions</h3>
+                            <div class="space-y-3">
+                                <details class="text-sm">
+                                    <summary class="cursor-pointer text-brand-brown font-medium hover:text-brand-orange">How do you travel on ₹500/day?</summary>
+                                    <p class="text-gray-600 mt-2 pl-4">Budget hostels (₹200), local transport (₹100), street food (₹150), miscellaneous (₹50).</p>
+                                </details>
+                                <details class="text-sm">
+                                    <summary class="cursor-pointer text-brand-brown font-medium hover:text-brand-orange">Can I follow your exact route?</summary>
+                                    <p class="text-gray-600 mt-2 pl-4">Yes! All route details, accommodations, and transport options are documented in destination guides.</p>
+                                </details>
+                                <details class="text-sm">
+                                    <summary class="cursor-pointer text-brand-brown font-medium hover:text-brand-orange">Do you accept travel recommendations?</summary>
+                                    <p class="text-gray-600 mt-2 pl-4">Absolutely! Send location suggestions via the contact form above.</p>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-brown text-white py-16">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <i class="fas fa-mountain text-brand-orange text-2xl"></i>
+                        <span class="font-playfair text-2xl font-bold">Milesalone</span>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        Documenting authentic India travel experiences, one story at a time. From Kashmir to Kanyakumari on ₹500 per day.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-brand-orange transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-brand-orange transition-colors">
+                            <i class="fab fa-youtube text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-brand-orange transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="mailto:hello@milesalone.com" class="text-gray-300 hover:text-brand-orange transition-colors">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold mb-4">Explore</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#journey" class="text-gray-300 hover:text-white transition-colors">Journey Map</a></li>
+                        <li><a href="#letters" class="text-gray-300 hover:text-white transition-colors">Travel Letters</a></li>
+                        <li><a href="#gallery" class="text-gray-300 hover:text-white transition-colors">Photo Gallery</a></li>
+                        <li><a href="#about" class="text-gray-300 hover:text-white transition-colors">About Shashank</a></li>
+                    </ul>
+                </div>
+
+                <!-- Destinations -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold mb-4">Popular Destinations</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Kashmir Valley</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Rajasthan Desert</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Goa Beaches</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Kerala Backwaters</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Kanyakumari</a></li>
+                    </ul>
+                </div>
+
+                <!-- Journey Stats -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold mb-4">Journey Progress</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Days Traveled</span>
+                            <span class="text-white font-semibold">78 / 120</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">States Covered</span>
+                            <span class="text-white font-semibold">9 / 15+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Distance</span>
+                            <span class="text-white font-semibold">1,950 km</span>
+                        </div>
+                        <div class="w-full bg-gray-600 rounded-full h-2 mt-4">
+                            <div class="bg-brand-orange h-2 rounded-full" style="width: 65%"></div>
+                        </div>
+                        <p class="text-xs text-gray-400">65% journey complete</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-600 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-300 text-sm mb-4 md:mb-0">
+                        © 2025 Milesalone. All rights reserved. Built with passion for authentic travel.
+                    </p>
+                    <div class="flex space-x-6 text-sm">
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">Terms of Use</a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav lg:hidden">
+        <div class="flex justify-around items-center h-16">
+            <a href="#home" onclick="setActiveNav('home')" id="nav-home" class="flex flex-col items-center space-y-1 px-2 py-1 mobile-nav-active">
+                <i class="fas fa-home text-lg"></i>
+                <span class="text-xs">Home</span>
+            </a>
+            <a href="#journey" onclick="setActiveNav('journey')" id="nav-journey" class="flex flex-col items-center space-y-1 px-2 py-1 text-gray-600">
+                <i class="fas fa-map-marked-alt text-lg"></i>
+                <span class="text-xs">Journey</span>
+            </a>
+            <a href="#letters" onclick="setActiveNav('letters')" id="nav-letters" class="flex flex-col items-center space-y-1 px-2 py-1 text-gray-600">
+                <i class="fas fa-book-open text-lg"></i>
+                <span class="text-xs">Letters</span>
+            </a>
+            <a href="#gallery" onclick="setActiveNav('gallery')" id="nav-gallery" class="flex flex-col items-center space-y-1 px-2 py-1 text-gray-600">
+                <i class="fas fa-images text-lg"></i>
+                <span class="text-xs">Gallery</span>
+            </a>
+            <a href="#about" onclick="setActiveNav('about')" id="nav-about" class="flex flex-col items-center space-y-1 px-2 py-1 text-gray-600">
+                <i class="fas fa-user text-lg"></i>
+                <span class="text-xs">About</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        let map;
+        let journeyRoute;
+        let currentGallery = [];
+        let currentImageIndex = 0;
+        let adminMode = false;
+
+        (function() {
+            // Initialize Leaflet map
+            function initMap() {
+                map = L.map('map').setView([20.5937, 78.9629], 5);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Journey waypoints
+                const waypoints = [
+                    {lat: 34.0837, lng: 74.7973, name: "Srinagar, Kashmir", status: "completed", type: "start"},
+                    {lat: 32.2190, lng: 76.3234, name: "Dharamshala, HP", status: "completed", type: "waypoint"},
+                    {lat: 28.7041, lng: 77.1025, name: "Delhi", status: "completed", type: "waypoint"},
+                    {lat: 26.9124, lng: 75.7873, name: "Jaipur, Rajasthan", status: "completed", type: "waypoint"},
+                    {lat: 23.0225, lng: 72.5714, name: "Ahmedabad, Gujarat", status: "completed", type: "waypoint"},
+                    {lat: 19.0760, lng: 72.8777, name: "Mumbai, Maharashtra", status: "completed", type: "waypoint"},
+                    {lat: 15.2993, lng: 74.1240, name: "Goa", status: "completed", type: "waypoint"},
+                    {lat: 12.2958, lng: 76.6394, name: "Mysuru, Karnataka", status: "current", type: "current"},
+                    {lat: 11.0168, lng: 76.9558, name: "Coimbatore, TN", status: "upcoming", type: "waypoint"},
+                    {lat: 8.0883, lng: 77.0200, name: "Kanyakumari, TN", status: "upcoming", type: "end"}
+                ];
+
+                // Add markers
+                waypoints.forEach(point => {
+                    let icon;
+                    if (point.type === 'start') {
+                        icon = L.divIcon({
+                            html: '<i class="fas fa-flag text-green-500 text-2xl"></i>',
+                            className: 'custom-div-icon',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30]
+                        });
+                    } else if (point.type === 'current') {
+                        icon = L.divIcon({
+                            html: '<i class="fas fa-map-pin text-orange-500 text-3xl"></i>',
+                            className: 'custom-div-icon',
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 40]
+                        });
+                    } else if (point.type === 'end') {
+                        icon = L.divIcon({
+                            html: '<i class="fas fa-flag-checkered text-red-500 text-2xl"></i>',
+                            className: 'custom-div-icon',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30]
+                        });
+                    } else {
+                        const color = point.status === 'completed' ? 'blue-500' : 'gray-400';
+                        icon = L.divIcon({
+                            html: `<i class="fas fa-circle text-${color} text-lg"></i>`,
+                            className: 'custom-div-icon',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 20]
+                        });
+                    }
+
+                    L.marker([point.lat, point.lng], {icon: icon})
+                        .bindPopup(`<strong>${point.name}</strong><br>Status: ${point.status}`)
+                        .addTo(map);
+                });
+
+                // Draw route line
+                const routeCoords = waypoints.map(p => [p.lat, p.lng]);
+                journeyRoute = L.polyline(routeCoords, {
+                    color: '#E07A3E',
+                    weight: 3,
+                    opacity: 0.8
+                }).addTo(map);
+            }
+
+            // Mobile navigation
+            window.setActiveNav = function(section) {
+                // Remove active class from all nav items
+                document.querySelectorAll('[id^="nav-"]').forEach(nav => {
+                    nav.classList.remove('mobile-nav-active');
+                    nav.classList.add('text-gray-600');
+                });
+                
+                // Add active class to selected nav
+                const activeNav = document.getElementById(`nav-${section}`);
+                if (activeNav) {
+                    activeNav.classList.add('mobile-nav-active');
+                    activeNav.classList.remove('text-gray-600');
+                }
+            };
+
+            // Smooth scrolling
+            window.scrollToSection = function(sectionId) {
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+
+            // Mobile menu toggle
+            window.toggleMobileMenu = function() {
+                const menu = document.getElementById('mobileMenu');
+                const panel = document.getElementById('mobileMenuPanel');
+                
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    setTimeout(() => {
+                        panel.classList.remove('translate-x-full');
+                    }, 10);
+                } else {
+                    panel.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        menu.classList.add('hidden');
+                    }, 300);
+                }
+            };
+
+            // Admin functionality
+            window.toggleAdminLogin = function() {
+                const modal = document.getElementById('adminModal');
+                modal.classList.toggle('hidden');
+            };
+
+            window.mockGoogleLogin = function() {
+                // Simulate Google OAuth login
+                setTimeout(() => {
+                    toggleAdminLogin();
+                    toggleAdminMode();
+                }, 1000);
+            };
+
+            window.toggleAdminMode = function() {
+                adminMode = !adminMode;
+                const adminDashboard = document.getElementById('adminDashboard');
+                const mainContent = document.getElementById('mainContent');
+                
+                if (adminMode) {
+                    adminDashboard.classList.remove('admin-hidden');
+                    adminDashboard.classList.add('admin-visible');
+                    mainContent.style.display = 'none';
+                } else {
+                    adminDashboard.classList.add('admin-hidden');
+                    adminDashboard.classList.remove('admin-visible');
+                    mainContent.style.display = 'block';
+                }
+            };
+
+            // Blog filtering
+            window.filterBlogPosts = function(category) {
+                const posts = document.querySelectorAll('#blogGrid article');
+                const buttons = document.querySelectorAll('[onclick^="filterBlogPosts"]');
+                
+                // Update button states
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-brand-orange', 'text-white');
+                    btn.classList.add('bg-white', 'text-brand-brown');
+                });
+                event.target.classList.add('bg-brand-orange', 'text-white');
+                event.target.classList.remove('bg-white', 'text-brand-brown');
+                
+                // Filter posts
+                posts.forEach(post => {
+                    if (category === 'all' || post.dataset.category === category) {
+                        post.style.display = 'block';
+                    } else {
+                        post.style.display = 'none';
+                    }
+                });
+            };
+
+            // Gallery functionality
+            window.openGallery = function(collection) {
+                // Sample gallery data
+                const galleries = {
+                    kashmir: [
+                        {src: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800', caption: 'Sunrise over Dal Lake'},
+                        {src: 'https://images.unsplash.com/photo-1464822759844-d150ad6d1036?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800', caption: 'Traditional Shikara boats'},
+                        {src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800', caption: 'Mountain trekking paths'}
+                    ],
+                    rajasthan: [
+                        {src: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800', caption: 'Camel caravan at sunset'},
+                        {src: 'https://images.unsplash.com/photo-1599661046827-dacde645976d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800', caption: 'Amber Fort architecture'}
+                    ]
+                };
+                
+                currentGallery = galleries[collection] || [];
+                currentImageIndex = 0;
+                showImage();
+                document.getElementById('galleryLightbox').classList.remove('hidden');
+            };
+
+            window.closeGallery = function() {
+                document.getElementById('galleryLightbox').classList.add('hidden');
+            };
+
+            window.nextImage = function() {
+                currentImageIndex = (currentImageIndex + 1) % currentGallery.length;
+                showImage();
+            };
+
+            window.prevImage = function() {
+                currentImageIndex = (currentImageIndex - 1 + currentGallery.length) % currentGallery.length;
+                showImage();
+            };
+
+            function showImage() {
+                if (currentGallery.length === 0) return;
+                
+                const image = currentGallery[currentImageIndex];
+                document.getElementById('lightboxContent').innerHTML = 
+                    `<img src="${image.src}" alt="${image.caption}" class="max-w-full max-h-full object-contain rounded-lg">`;
+                document.getElementById('imageCaption').textContent = image.caption;
+                document.getElementById('imageCounter').textContent = `${currentImageIndex + 1} of ${currentGallery.length}`;
+            }
+
+            // Form submissions
+            window.subscribeNewsletter = function(event) {
+                event.preventDefault();
+                // TODO: Implement newsletter subscription
+                alert('Thank you for subscribing! You\'ll receive weekly updates about the journey.');
+                event.target.reset();
+            };
+
+            window.sendMessage = function(event) {
+                event.preventDefault();
+                // TODO: Implement contact form submission
+                alert('Message sent successfully! I\'ll get back to you within 24 hours.');
+                event.target.reset();
+            };
+
+            // Intersection Observer for navigation
+            const observerOptions = {
+                threshold: 0.3,
+                rootMargin: '-50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const sectionId = entry.target.id;
+                        setActiveNav(sectionId);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe sections
+            ['home', 'journey', 'letters', 'gallery', 'about'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    observer.observe(element);
+                }
+            });
+
+            // Keyboard navigation for gallery
+            document.addEventListener('keydown', (e) => {
+                const lightbox = document.getElementById('galleryLightbox');
+                if (!lightbox.classList.contains('hidden')) {
+                    switch(e.key) {
+                        case 'Escape':
+                            closeGallery();
+                            break;
+                        case 'ArrowLeft':
+                            prevImage();
+                            break;
+                        case 'ArrowRight':
+                            nextImage();
+                            break;
+                    }
+                }
+            });
+
+            // Initialize on load
+            document.addEventListener('DOMContentLoaded', initMap);
+        })();
+    </script>
+</body>
+</html>
