@@ -5,5 +5,5 @@
 /attached_assets/* /attached_assets/:splat 200
 /assets/* /assets/:splat 200
 
-# Handle all other routes (SPA fallback)
+# SPA fallback - all routes go to index.html
 /* /index.html 200
