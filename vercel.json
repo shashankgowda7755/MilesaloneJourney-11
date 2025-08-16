@@ -2,7 +2,6 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
-  "framework": null,
   "functions": {
     "api/index.js": {
       "maxDuration": 30
@@ -12,6 +11,10 @@
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
+    },
+    {
+      "source": "/((?!api|_next|static|favicon.ico).*)",
+      "destination": "/index.html"
     }
   ]
 }
