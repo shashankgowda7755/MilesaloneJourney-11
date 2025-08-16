@@ -129,6 +129,30 @@ const setupDatabase = async () => {
         VALUES 
         ('Kashmir Valley', 'Beautiful valley with pristine lakes', '{"lat": 34.0837, "lng": 74.7973}', 5, '2024-01-15', 'Absolutely stunning scenery');
       `);
+
+      // Check if gallery_collections table exists and has data
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS gallery_collections (
+          id SERIAL PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          description TEXT,
+          cover_image VARCHAR(500),
+          media_count INTEGER DEFAULT 0,
+          location VARCHAR(255),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      const galleryCount = await pool.query('SELECT COUNT(*) FROM gallery_collections');
+      if (parseInt(galleryCount.rows[0].count) === 0) {
+        await pool.query(`
+          INSERT INTO gallery_collections (title, description, cover_image, media_count, location)
+          VALUES 
+          ('Kashmir Valley Adventures', 'Beautiful landscapes from the Kashmir valley', 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', 12, 'Kashmir, India'),
+          ('Cultural Celebrations', 'Vibrant festivals and local traditions', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', 8, 'Various Locations'),
+          ('Local Cuisine Journey', 'Authentic food experiences across India', 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800', 15, 'Delhi, Mumbai, Chennai');
+        `);
+      }
     }
 
     databaseSetup = true;
@@ -314,18 +338,136 @@ app.get('/api/travel-pins', async (req, res) => {
 // Gallery API
 app.get('/api/gallery', async (req, res) => {
   try {
-    res.json([
-      {
-        id: "1",
+    await ensureDatabase();
+    
+    if (pool) {
+      // Create gallery table if it doesn't exist
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS gallery_collections (
+          id SERIAL PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          description TEXT,
+          cover_image VARCHAR(500),
+          media_count INTEGER DEFAULT 0,
+          location VARCHAR(255),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      const result = await pool.query('SELECT * FROM gallery_collections ORDER BY created_at DESC');
+      const collections = result.rows.map(row => ({
+        id: row.id.toString(),
+        title: row.title,
+        description: row.description,
+        coverImage: row.cover_image,
+        mediaCount: row.media_count,
+        location: row.location
+      }));
+      res.json(collections);
+    } else {
+      res.json([
+        {
+          id: "1",
+          title: "Kashmir Valley Adventures",
+          description: "Beautiful landscapes from the Kashmir valley",
+          coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+          mediaCount: 12,
+          location: "Kashmir, India"
+        }
+      ]);
+    }
+  } catch (error) {
+    console.error('Gallery error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get specific gallery collection
+app.get('/api/gallery/:id', async (req, res) => {
+  try {
+    await ensureDatabase();
+    const { id } = req.params;
+    
+    if (pool) {
+      const result = await pool.query('SELECT * FROM gallery_collections WHERE id = $1', [id]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Gallery collection not found' });
+      }
+      
+      const collection = result.rows[0];
+      res.json({
+        id: collection.id.toString(),
+        title: collection.title,
+        description: collection.description,
+        coverImage: collection.cover_image,
+        mediaCount: collection.media_count,
+        location: collection.location,
+        media: [
+          {
+            id: "1",
+            type: "image",
+            url: collection.cover_image,
+            caption: collection.description
+          }
+        ]
+      });
+    } else {
+      res.json({
+        id: id,
         title: "Kashmir Valley Adventures",
         description: "Beautiful landscapes from the Kashmir valley",
         coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
         mediaCount: 12,
-        location: "Kashmir, India"
-      }
-    ]);
+        location: "Kashmir, India",
+        media: [
+          {
+            id: "1",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            caption: "Beautiful valley views"
+          }
+        ]
+      });
+    }
   } catch (error) {
-    console.error('Gallery error:', error);
+    console.error('Gallery detail error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create gallery collection
+app.post('/api/gallery', async (req, res) => {
+  try {
+    await ensureDatabase();
+    const { title, description, coverImage, location } = req.body;
+    
+    if (pool) {
+      const result = await pool.query(
+        'INSERT INTO gallery_collections (title, description, cover_image, location, media_count) VALUES ($1, $2, $3, $4, 1) RETURNING *',
+        [title, description, coverImage, location]
+      );
+      
+      const collection = result.rows[0];
+      res.status(201).json({
+        id: collection.id.toString(),
+        title: collection.title,
+        description: collection.description,
+        coverImage: collection.cover_image,
+        mediaCount: collection.media_count,
+        location: collection.location
+      });
+    } else {
+      res.status(201).json({
+        id: Date.now().toString(),
+        title,
+        description,
+        coverImage,
+        mediaCount: 1,
+        location
+      });
+    }
+  } catch (error) {
+    console.error('Create gallery error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -400,23 +542,136 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out' });
 });
 
+// CREATE operations for admin panel
+
+// Create blog post
+app.post('/api/blog-posts', async (req, res) => {
+  try {
+    await ensureDatabase();
+    const { title, slug, excerpt, content, featuredImage, category, tags, readingTime, isFeatured } = req.body;
+    
+    if (pool) {
+      const result = await pool.query(
+        'INSERT INTO blog_posts (title, slug, excerpt, content, featured_image, category, tags, reading_time, is_featured) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+        [title, slug, excerpt, content, featuredImage, category, tags, readingTime, isFeatured]
+      );
+      
+      const post = result.rows[0];
+      res.status(201).json({
+        id: post.id.toString(),
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt,
+        content: post.content,
+        featuredImage: post.featured_image,
+        category: post.category,
+        tags: post.tags,
+        readingTime: post.reading_time,
+        isFeatured: post.is_featured
+      });
+    } else {
+      res.status(201).json({
+        id: Date.now().toString(),
+        title, slug, excerpt, content, featuredImage, category, tags, readingTime, isFeatured
+      });
+    }
+  } catch (error) {
+    console.error('Create blog post error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create destination
+app.post('/api/destinations', async (req, res) => {
+  try {
+    await ensureDatabase();
+    const { name, slug, description, category, region, state, coordinates, featuredImage, rating, difficulty, isFeatured } = req.body;
+    
+    if (pool) {
+      const result = await pool.query(
+        'INSERT INTO destinations (name, slug, description, category, region, state, coordinates, featured_image, rating, difficulty, is_featured) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+        [name, slug, description, category, region, state, coordinates, featuredImage, rating, difficulty, isFeatured]
+      );
+      
+      const destination = result.rows[0];
+      res.status(201).json({
+        id: destination.id.toString(),
+        name: destination.name,
+        slug: destination.slug,
+        description: destination.description,
+        category: destination.category,
+        region: destination.region,
+        state: destination.state,
+        coordinates: destination.coordinates,
+        featuredImage: destination.featured_image,
+        rating: destination.rating,
+        difficulty: destination.difficulty,
+        isFeatured: destination.is_featured
+      });
+    } else {
+      res.status(201).json({
+        id: Date.now().toString(),
+        name, slug, description, category, region, state, coordinates, featuredImage, rating, difficulty, isFeatured
+      });
+    }
+  } catch (error) {
+    console.error('Create destination error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create travel pin
+app.post('/api/travel-pins', async (req, res) => {
+  try {
+    await ensureDatabase();
+    const { name, description, coordinates, rating, visitDate, notes } = req.body;
+    
+    if (pool) {
+      const result = await pool.query(
+        'INSERT INTO travel_pins (name, description, coordinates, rating, visit_date, notes) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [name, description, coordinates, rating, visitDate, notes]
+      );
+      
+      const pin = result.rows[0];
+      res.status(201).json({
+        id: pin.id.toString(),
+        name: pin.name,
+        description: pin.description,
+        coordinates: pin.coordinates,
+        rating: pin.rating,
+        visitDate: pin.visit_date,
+        notes: pin.notes
+      });
+    } else {
+      res.status(201).json({
+        id: Date.now().toString(),
+        name, description, coordinates, rating, visitDate, notes
+      });
+    }
+  } catch (error) {
+    console.error('Create travel pin error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Admin stats API
 app.get('/api/admin/stats', async (req, res) => {
   try {
     await ensureDatabase();
     
     if (pool) {
-      const [postsResult, destinationsResult, pinsResult] = await Promise.all([
+      const [postsResult, destinationsResult, pinsResult, galleriesResult] = await Promise.all([
         pool.query('SELECT COUNT(*) FROM blog_posts'),
         pool.query('SELECT COUNT(*) FROM destinations'),
-        pool.query('SELECT COUNT(*) FROM travel_pins')
+        pool.query('SELECT COUNT(*) FROM travel_pins'),
+        pool.query('SELECT COUNT(*) FROM gallery_collections')
       ]);
       
       res.json({
         totalPosts: parseInt(postsResult.rows[0].count),
         totalDestinations: parseInt(destinationsResult.rows[0].count),
         totalPins: parseInt(pinsResult.rows[0].count),
-        totalGalleries: 1
+        totalGalleries: parseInt(galleriesResult.rows[0].count)
       });
     } else {
       res.json({

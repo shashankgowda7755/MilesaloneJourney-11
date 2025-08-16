@@ -11,16 +11,28 @@ interface GalleryGridProps {
 }
 
 export default function GalleryGrid({ searchQuery = "" }: GalleryGridProps) {
-  const { data: allCollections = [], isLoading } = useQuery<GalleryCollectionWithMedia[]>({
+  const { data: allCollections = [], isLoading, error } = useQuery<GalleryCollectionWithMedia[]>({
     queryKey: ["/api/gallery"],
   });
 
+  console.log('GalleryGrid - isLoading:', isLoading, 'data:', allCollections, 'error:', error);
+
   // Filter collections based on search query
   const collections = allCollections.filter(collection => 
-    collection.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    collection.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    collection.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    collection.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (collection.location && collection.location.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  if (error) {
+    console.error('Gallery loading error:', error);
+    return (
+      <div className="text-center py-16" data-testid="gallery-error">
+        <p className="text-red-500 text-lg">Error loading gallery collections</p>
+        <p className="text-gray-400 mt-2">Please try refreshing the page</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 gallery-grid" data-testid="gallery-grid">
@@ -70,24 +82,24 @@ export default function GalleryGrid({ searchQuery = "" }: GalleryGridProps) {
                   
                   {/* Media thumbnails strip */}
                   <div className="flex space-x-2 overflow-x-auto pb-2 mb-4" data-testid="collection-thumbnails">
-                    {collection.media.slice(0, 4).map((media, index) => (
+                    {collection.media?.slice(0, 4).map((media, index) => (
                       <div
-                        key={media.id}
+                        key={media?.id || index}
                         className="relative w-20 h-12 flex-shrink-0 rounded-lg overflow-hidden"
                         data-testid={`thumbnail-${index}`}
                       >
                         <img
-                          src={media.url}
-                          alt={media.caption || `Photo ${index + 1}`}
+                          src={media?.url || collection.coverImage}
+                          alt={media?.caption || `Photo ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
-                        {media.type === 'video' && (
+                        {media?.type === 'video' && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
                             <Play className="w-4 h-4 text-white fill-current" />
                           </div>
                         )}
                       </div>
-                    ))}
+                    )) || []}
                     {collection.mediaCount > 4 && (
                       <div className="w-20 h-12 flex-shrink-0 rounded-lg bg-gray-200 flex items-center justify-center text-gray-500 text-xs">
                         +{collection.mediaCount - 4}
