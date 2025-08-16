@@ -1,7 +1,8 @@
 // Vercel serverless function handler for the travel blog API
 import express from 'express';
 import session from 'express-session';
-import { Pool } from 'pg';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 // Create Express app
 const app = express();

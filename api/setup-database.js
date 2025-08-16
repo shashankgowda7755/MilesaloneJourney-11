@@ -1,5 +1,6 @@
 // Database setup script for Supabase
-import { Pool } from 'pg';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 const setupDatabase = async () => {
   if (!process.env.DATABASE_URL) {
