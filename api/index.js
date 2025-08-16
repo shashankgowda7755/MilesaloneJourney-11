@@ -21,24 +21,45 @@ app.use(session({
   }
 }));
 
-// Import compiled routes and database
-const { Pool, neonConfig } = require('@neondatabase/serverless');
-const { drizzle } = require('drizzle-orm/neon-serverless');
-const ws = require('ws');
+// Import database for Supabase
+const { Pool } = require('pg');
 
-// Configure WebSocket for Neon
-neonConfig.webSocketConstructor = ws;
+// Database setup for Supabase
+let pool;
+let db;
 
-// Database setup
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL must be set');
+try {
+  if (process.env.DATABASE_URL) {
+    pool = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+    console.log('Supabase database connection initialized');
+  } else {
+    console.log('No DATABASE_URL provided, using sample data');
+  }
+} catch (error) {
+  console.error('Database connection error:', error);
 }
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const db = drizzle({ client: pool });
+// Setup database on first request
+const { setupDatabase } = require('./setup-database');
+let databaseSetup = false;
+
+const ensureDatabase = async () => {
+  if (!databaseSetup && process.env.DATABASE_URL) {
+    try {
+      await setupDatabase();
+      databaseSetup = true;
+    } catch (error) {
+      console.error('Database setup failed:', error);
+    }
+  }
+};
 
 // Test route
-app.get('/api/test', (req, res) => {
+app.get('/api/test', async (req, res) => {
+  await ensureDatabase();
   res.json({ message: 'Travel Blog API is working!', timestamp: new Date().toISOString() });
 });
 
@@ -52,24 +73,43 @@ try {
 } catch (error) {
   console.log('Compiled routes not found, using basic routes');
   
-  // Basic API routes for functionality
+  // Blog posts API
   app.get('/api/blog-posts', async (req, res) => {
     try {
-      // Sample blog posts data
-      res.json([
-        {
-          id: "1",
-          title: "Delhi Streets: A Culinary Adventure",
-          slug: "delhi-streets-culinary-adventure",
-          excerpt: "Exploring the vibrant street food scene of Old Delhi",
-          featuredImage: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800",
-          category: "food",
-          tags: ["delhi", "street-food", "culture"],
-          readingTime: 5,
-          isFeatured: true
-        }
-      ]);
+      await ensureDatabase();
+      
+      if (pool) {
+        const result = await pool.query('SELECT * FROM blog_posts ORDER BY created_at DESC');
+        const posts = result.rows.map(row => ({
+          id: row.id.toString(),
+          title: row.title,
+          slug: row.slug,
+          excerpt: row.excerpt,
+          featuredImage: row.featured_image,
+          category: row.category,
+          tags: row.tags || [],
+          readingTime: row.reading_time,
+          isFeatured: row.is_featured
+        }));
+        res.json(posts);
+      } else {
+        // Fallback sample data
+        res.json([
+          {
+            id: "1",
+            title: "Delhi Streets: A Culinary Adventure",
+            slug: "delhi-streets-culinary-adventure",
+            excerpt: "Exploring the vibrant street food scene of Old Delhi",
+            featuredImage: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800",
+            category: "food",
+            tags: ["delhi", "street-food", "culture"],
+            readingTime: 5,
+            isFeatured: true
+          }
+        ]);
+      }
     } catch (error) {
+      console.error('Blog posts error:', error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -124,17 +164,40 @@ try {
   });
 
   app.post('/api/auth/login', (req, res) => {
-    const { username, password } = req.body;
-    
-    if (username === 'admin' && password === process.env.ADMIN_PASSWORD) {
-      req.session.user = {
-        id: 'admin',
-        name: 'Administrator',
-        email: 'admin@travelblog.com'
-      };
-      res.json({ success: true, message: 'Login successful' });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials' });
+    try {
+      const { username, password } = req.body;
+      
+      console.log('Login attempt:', { username, hasPassword: !!password });
+      console.log('Expected password:', process.env.ADMIN_PASSWORD);
+      
+      if (username === 'admin' && password === process.env.ADMIN_PASSWORD) {
+        req.session.user = {
+          id: 'admin',
+          name: 'Administrator',
+          email: 'admin@travelblog.com'
+        };
+        return res.status(200).json({ 
+          success: true, 
+          message: 'Login successful',
+          user: {
+            id: 'admin',
+            name: 'Administrator',
+            email: 'admin@travelblog.com'
+          }
+        });
+      } else {
+        return res.status(401).json({ 
+          success: false,
+          message: 'Invalid credentials' 
+        });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Server error during login',
+        error: error.message 
+      });
     }
   });
 
