@@ -183,6 +183,10 @@ export class MemStorage implements IStorage {
       daysTraveled: 78,
       statesCovered: 9,
       distanceCovered: 1950,
+      instagramStoryUrl: null,
+      instagramReelUrl: null,
+      twitterUpdateUrl: null,
+      youtubeShortUrl: null,
       lastUpdated: new Date(),
     };
 
@@ -246,8 +250,16 @@ export class MemStorage implements IStorage {
       const pin: TravelPin = {
         ...pinData,
         id,
+        description: pinData.description || null,
         images: pinData.images || [],
-        tags: pinData.tags || [],
+        tags: pinData.tags || null,
+        isVisible: pinData.isVisible ?? true,
+        instagramPostUrl: null,
+        twitterPostUrl: null,
+        facebookPostUrl: null,
+        youtubeVideoUrl: null,
+        socialMediaHashtags: [],
+        notes: pinData.notes || null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -441,7 +453,13 @@ export class MemStorage implements IStorage {
 
     // Store galleries  
     galleryData.forEach(gallery => {
-      this.galleryCollections.set(gallery.id, gallery);
+      const galleryCollection: GalleryCollection = {
+        ...gallery,
+        location: gallery.location || null,
+        youtubeUrl: gallery.youtubeUrl || null,
+        isVisible: true,
+      };
+      this.galleryCollections.set(gallery.id, galleryCollection);
       
       // Initialize some sample media for each collection with themed images
       const mediaItems: GalleryMedia[] = [];
@@ -453,7 +471,11 @@ export class MemStorage implements IStorage {
           collectionId: gallery.id,
           type: 'photo',
           url: imageUrls[i % imageUrls.length],
+          title: null,
           caption: this.getImageCaption(gallery.id, i),
+          thumbnailUrl: null,
+          embedCode: null,
+          linkUrl: null,
           sortOrder: i,
           createdAt: new Date(),
         });
@@ -465,15 +487,21 @@ export class MemStorage implements IStorage {
       const destination: Destination = {
         ...dest,
         id: randomUUID(),
-        highlights: dest.highlights ?? [],
-        activities: dest.activities ?? [],
+        highlights: dest.highlights || [],
+        activities: dest.activities || [],
         rating: dest.rating ?? 30,
         isFeatured: dest.isFeatured ?? false,
+        isVisible: true,
         isCurrentLocation: dest.isCurrentLocation ?? false,
+        instagramPostUrl: null,
+        twitterPostUrl: null,
+        facebookPostUrl: null,
+        youtubeVideoUrl: null,
+        socialMediaHashtags: [],
         // Connect destinations with galleries
         relatedGalleryId: dest.slug === 'srinagar-kashmir' ? "kashmir-floating-gardens" : 
                           dest.slug === 'jaipur-rajasthan' ? "royal-rajasthan" : null,
-        relatedBlogPosts: dest.relatedBlogPosts ?? [],
+        relatedBlogPosts: dest.relatedBlogPosts || [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -636,6 +664,12 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
         id: randomUUID(),
         tags: post.tags ?? [],
         isFeatured: post.isFeatured ?? false,
+        isVisible: true,
+        instagramPostUrl: null,
+        twitterPostUrl: null,
+        facebookPostUrl: null,
+        youtubeVideoUrl: null,
+        socialMediaHashtags: [],
         publishedAt: post.publishedAt ?? new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -748,6 +782,14 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
     const post: BlogPost = {
       ...insertPost,
       id,
+      tags: insertPost.tags || [],
+      isVisible: insertPost.isVisible ?? true,
+      instagramPostUrl: null,
+      twitterPostUrl: null,
+      facebookPostUrl: null,
+      youtubeVideoUrl: null,
+      socialMediaHashtags: [],
+      publishedAt: insertPost.publishedAt || new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -803,6 +845,18 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
     const destination: Destination = {
       ...insertDestination,
       id,
+      highlights: insertDestination.highlights || [],
+      activities: insertDestination.activities || [],
+      rating: insertDestination.rating || 30,
+      isFeatured: insertDestination.isFeatured ?? false,
+      isVisible: true,
+      isCurrentLocation: insertDestination.isCurrentLocation ?? false,
+      instagramPostUrl: null,
+      twitterPostUrl: null,
+      facebookPostUrl: null,
+      youtubeVideoUrl: null,
+      socialMediaHashtags: [],
+      relatedBlogPosts: insertDestination.relatedBlogPosts || [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -856,6 +910,8 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
       ...insertCollection,
       id,
       mediaCount: 0,
+      location: insertCollection.location || null,
+      youtubeUrl: insertCollection.youtubeUrl || null,
       isVisible: insertCollection.isVisible ?? true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -888,6 +944,12 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
     const media: GalleryMedia = {
       ...insertMedia,
       id,
+      title: insertMedia.title || null,
+      caption: insertMedia.caption || null,
+      thumbnailUrl: insertMedia.thumbnailUrl || null,
+      embedCode: insertMedia.embedCode || null,
+      linkUrl: insertMedia.linkUrl || null,
+      sortOrder: insertMedia.sortOrder || 0,
       createdAt: new Date(),
     };
 
@@ -967,6 +1029,14 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
     this.journeyTracking = {
       ...insertTracking,
       id,
+      journeyProgress: insertTracking.journeyProgress || 0,
+      daysTraveled: insertTracking.daysTraveled || 0,
+      statesCovered: insertTracking.statesCovered || 0,
+      distanceCovered: insertTracking.distanceCovered || 0,
+      instagramStoryUrl: insertTracking.instagramStoryUrl || null,
+      instagramReelUrl: insertTracking.instagramReelUrl || null,
+      twitterUpdateUrl: insertTracking.twitterUpdateUrl || null,
+      youtubeShortUrl: insertTracking.youtubeShortUrl || null,
       lastUpdated: new Date(),
     };
     return this.journeyTracking;
@@ -989,7 +1059,14 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
       ...insertPin,
       id,
       images: insertPin.images || [],
-      tags: insertPin.tags || [],
+      tags: insertPin.tags || null,
+      isVisible: insertPin.isVisible ?? true,
+      instagramPostUrl: null,
+      twitterPostUrl: null,
+      facebookPostUrl: null,
+      youtubeVideoUrl: null,
+      socialMediaHashtags: [],
+      notes: insertPin.notes || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
