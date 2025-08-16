@@ -1,5 +1,5 @@
 // Database setup script for Supabase
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 const setupDatabase = async () => {
   if (!process.env.DATABASE_URL) {
@@ -161,4 +161,4 @@ const setupDatabase = async () => {
   }
 };
 
-module.exports = { setupDatabase };
+export { setupDatabase };
