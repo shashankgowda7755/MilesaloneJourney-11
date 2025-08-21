@@ -87,10 +87,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/home-content", async (req, res) => {
     try {
-      // Simple update for development - production uses api/index.js
-      res.json({ id: "dev", ...req.body, updatedAt: new Date() });
+      // Check if content exists
+      const existing = await db.select().from(homePageContent).limit(1);
+      
+      if (existing.length === 0) {
+        // Create new content
+        const [newContent] = await db.insert(homePageContent).values({
+          ...req.body,
+          updatedAt: new Date()
+        }).returning();
+        res.json(newContent);
+      } else {
+        // Update existing content
+        const [updatedContent] = await db.update(homePageContent)
+          .set({
+            ...req.body,
+            updatedAt: new Date()
+          })
+          .where(eq(homePageContent.id, existing[0].id))
+          .returning();
+        res.json(updatedContent);
+      }
     } catch (error) {
-      res.status(500).json({ message: "Failed to update" });
+      console.error("Home content update error:", error);
+      res.status(500).json({ message: "Failed to update home content" });
     }
   });
 
