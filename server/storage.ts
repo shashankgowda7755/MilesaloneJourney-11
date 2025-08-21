@@ -1094,4 +1094,5 @@ Delhi's street food scene represents India's diversity. North Indian, South Indi
   }
 }
 
-export const storage = new MemStorage();
+import { DatabaseStorage } from "./db-storage";
+export const storage = new DatabaseStorage();
