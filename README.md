@@ -44,16 +44,15 @@ A beautiful, full-stack travel blog application documenting authentic India trav
 ### 3. Environment Variables
 Add these in Vercel dashboard:
 ```env
-DATABASE_URL=your_neon_postgresql_connection_string
+DATABASE_URL=your_postgresql_connection_string
 SESSION_SECRET=your_random_secret_key
 ADMIN_PASSWORD=your_admin_password
 NODE_ENV=production
 ```
 
 ### 4. Database Setup
-1. Create free account at [neon.tech](https://neon.tech)
-2. Create new project
-3. Copy connection string to `DATABASE_URL`
+Use any PostgreSQL provider (Supabase, Railway, PlanetScale, etc.)
+Copy your connection string to `DATABASE_URL` environment variable.
 
 **That's it! Your travel blog will be live in 2-3 minutes! 🎉**
 
@@ -74,7 +73,7 @@ NODE_ENV=production
 - **Express Sessions** for authentication
 
 ### Database & Deployment
-- **PostgreSQL** with Neon serverless hosting
+- **PostgreSQL** with any provider (Supabase, Railway, etc.)
 - **Vercel** for deployment and hosting
 - **Vercel Functions** for serverless API
 
