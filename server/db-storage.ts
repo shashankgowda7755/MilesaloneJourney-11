@@ -9,7 +9,8 @@ import {
   contactMessages, 
   travelPins, 
   journeyTracking as journeyTable, 
-  users 
+  users,
+  homePageContent 
 } from "@shared/schema";
 import type {
   BlogPost,
@@ -31,6 +32,8 @@ import type {
   InsertJourneyTracking,
   User,
   InsertUser,
+  HomePageContent,
+  InsertHomePageContent,
 } from "@shared/schema";
 import { IStorage } from "./storage";
 
@@ -290,5 +293,28 @@ export class DatabaseStorage implements IStorage {
   async deleteTravelPin(id: string): Promise<boolean> {
     const result = await db.delete(travelPins).where(eq(travelPins.id, id));
     return result.rowCount! > 0;
+  }
+
+  // Home Page Content
+  async getHomePageContent(): Promise<HomePageContent | undefined> {
+    const [content] = await db.select().from(homePageContent).orderBy(desc(homePageContent.updatedAt));
+    return content;
+  }
+
+  async updateHomePageContent(content: Partial<InsertHomePageContent>): Promise<HomePageContent> {
+    // Check if home page content exists
+    const existingContent = await this.getHomePageContent();
+    
+    if (existingContent) {
+      const [updated] = await db.update(homePageContent)
+        .set({ ...content, updatedAt: new Date() })
+        .where(eq(homePageContent.id, existingContent.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new home page content with defaults
+      const [created] = await db.insert(homePageContent).values([content]).returning();
+      return created;
+    }
   }
 }

@@ -7,10 +7,12 @@ import InteractiveMap from "@/components/journey/interactive-map";
 import BlogCard from "@/components/blog/blog-card";
 import NewsletterForm from "@/components/newsletter/newsletter-form";
 import { useJourney } from "@/hooks/use-journey";
+import { useHomeContent } from "@/hooks/use-home-content";
 import type { BlogPost, Destination, GalleryCollection } from "@shared/schema";
 
 export default function Home() {
   const { data: journey } = useJourney();
+  const { data: homeContent } = useHomeContent();
   const { data: featuredPosts = [] } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog-posts/featured"],
   });
@@ -66,18 +68,31 @@ export default function Home() {
         {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80')" }}
+          style={{ backgroundImage: `url('${homeContent?.heroBackgroundImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80'}')` }}
         >
           <div className="hero-gradient absolute inset-0"></div>
         </div>
         
         <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
           <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold mb-6" data-testid="hero-title">
-            Raw Roads,<br />
-            <span className="text-brand-orange">Real Discovery</span>
+            {homeContent?.heroTitle?.split('\n').map((line, index) => (
+              <span key={index}>
+                {index === 1 ? (
+                  <span className="text-brand-orange">{line}</span>
+                ) : (
+                  line
+                )}
+                {index < (homeContent?.heroTitle?.split('\n').length || 1) - 1 && <br />}
+              </span>
+            )) || (
+              <>
+                Raw Roads,<br />
+                <span className="text-brand-orange">Real Discovery</span>
+              </>
+            )}
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto" data-testid="hero-subtitle">
-            Join Shashank's authentic 4-month journey across India, from Kashmir's valleys to Kanyakumari's shores, on just ₹500 per day
+            {homeContent?.heroSubtitle || "Join Shashank's authentic 4-month journey across India, from Kashmir's valleys to Kanyakumari's shores, on just ₹500 per day"}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/journey">
@@ -87,7 +102,7 @@ export default function Home() {
                 data-testid="explore-journey-button"
               >
                 <MapPin className="mr-2 h-5 w-5" />
-                Explore Journey
+                {homeContent?.exploreButtonText || "Explore Journey"}
               </Button>
             </Link>
             <Link href="/letters">
@@ -98,7 +113,7 @@ export default function Home() {
                 data-testid="read-diaries-button"
               >
                 <BookOpen className="mr-2 h-5 w-5" />
-                Read Diaries
+                {homeContent?.diariesButtonText || "Read Diaries"}
               </Button>
             </Link>
           </div>
@@ -124,7 +139,7 @@ export default function Home() {
               <div className="text-sm lg:text-base text-gray-200">Kilometers</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair">₹500</div>
+              <div className="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair">{homeContent?.dailyBudget || "₹500"}</div>
               <div className="text-sm lg:text-base text-gray-200">Per Day Budget</div>
             </div>
           </div>
@@ -144,11 +159,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="map-section-title">
-              Live Journey Tracker
+              {homeContent?.mapSectionTitle || "Live Journey Tracker"}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="map-section-description">
-              Follow the real-time progress from the serene valleys of Kashmir to the southern tip of Kanyakumari. 
-              Each pin tells a story of discovery, challenge, and authentic Indian experiences.
+              {homeContent?.mapSectionDescription || "Follow the real-time progress from the serene valleys of Kashmir to the southern tip of Kanyakumari. Each pin tells a story of discovery, challenge, and authentic Indian experiences."}
             </p>
           </div>
           
@@ -201,8 +215,8 @@ export default function Home() {
               <CardContent className="p-0">
                 <Calendar className="mx-auto text-brand-green text-3xl mb-4" />
                 <h3 className="font-playfair text-xl font-bold text-brand-brown mb-2">Journey Started</h3>
-                <p className="text-gray-600">August 1, 2025 - Srinagar, Kashmir</p>
-                <p className="text-sm text-gray-500 mt-2">Dal Lake houseboats and mountain serenity</p>
+                <p className="text-gray-600">{homeContent?.journeyStartDate || "August 1, 2025"} - {homeContent?.journeyStartLocation || "Srinagar, Kashmir"}</p>
+                <p className="text-sm text-gray-500 mt-2">{homeContent?.journeyStartDescription || "Dal Lake houseboats and mountain serenity"}</p>
               </CardContent>
             </Card>
             
@@ -219,8 +233,8 @@ export default function Home() {
               <CardContent className="p-0">
                 <Route className="mx-auto text-brand-brown text-3xl mb-4" />
                 <h3 className="font-playfair text-xl font-bold text-brand-brown mb-2">Final Destination</h3>
-                <p className="text-gray-600">Kanyakumari, Tamil Nadu</p>
-                <p className="text-sm text-gray-500 mt-2">Land's end where three seas meet</p>
+                <p className="text-gray-600">{homeContent?.finalDestination || "Kanyakumari, Tamil Nadu"}</p>
+                <p className="text-sm text-gray-500 mt-2">{homeContent?.finalDestinationDescription || "Land's end where three seas meet"}</p>
               </CardContent>
             </Card>
           </div>
@@ -232,10 +246,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="featured-posts-title">
-              Latest Travel Stories
+              {homeContent?.storiesSectionTitle || "Latest Travel Stories"}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="featured-posts-description">
-              Authentic stories from the road - the struggles, discoveries, and unexpected connections that make solo travel transformative.
+              {homeContent?.storiesSectionDescription || "Authentic stories from the road - the struggles, discoveries, and unexpected connections that make solo travel transformative."}
             </p>
           </div>
 
@@ -270,10 +284,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="guides-title">
-              Travel Guides
+              {homeContent?.guidesSectionTitle || "Travel Guides"}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="guides-description">
-              Comprehensive guides to the most incredible destinations on this journey. From planning to experiencing, get insider tips for authentic travel.
+              {homeContent?.guidesSectionDescription || "Comprehensive guides to the most incredible destinations on this journey. From planning to experiencing, get insider tips for authentic travel."}
             </p>
           </div>
 
@@ -355,10 +369,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="gallery-title">
-              Visual Journey
+              {homeContent?.gallerySectionTitle || "Visual Journey"}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="gallery-description">
-              Every photograph tells a story of discovery, challenge, and the incredible diversity of landscapes, cultures, and moments that define authentic India travel.
+              {homeContent?.gallerySectionDescription || "Every photograph tells a story of discovery, challenge, and the incredible diversity of landscapes, cultures, and moments that define authentic India travel."}
             </p>
           </div>
 
@@ -458,10 +472,10 @@ export default function Home() {
       <section className="py-16 lg:py-24 bg-brand-green" data-testid="newsletter-section">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-white mb-6" data-testid="newsletter-title">
-            Join the Journey
+            {homeContent?.newsletterTitle || "Join the Journey"}
           </h2>
           <p className="text-xl text-green-100 mb-12 max-w-2xl mx-auto" data-testid="newsletter-description">
-            Get weekly updates about new destinations, travel stories, and behind-the-scenes insights from the road. No spam, just authentic travel content.
+            {homeContent?.newsletterDescription || "Get weekly updates about new destinations, travel stories, and behind-the-scenes insights from the road. No spam, just authentic travel content."}
           </p>
 
           <NewsletterForm />
@@ -469,15 +483,15 @@ export default function Home() {
           {/* Social Proof */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-green-100" data-testid="newsletter-stats">
             <div className="text-center">
-              <div className="text-3xl font-bold text-white">342</div>
+              <div className="text-3xl font-bold text-white">{homeContent?.newsletterSubscribersCount || 342}</div>
               <div className="text-sm">Newsletter Subscribers</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-white">24</div>
+              <div className="text-3xl font-bold text-white">{homeContent?.weeklyStoriesCount || 24}</div>
               <div className="text-sm">Weekly Stories</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-white">95%</div>
+              <div className="text-3xl font-bold text-white">{homeContent?.readRate || 95}%</div>
               <div className="text-sm">Read Rate</div>
             </div>
           </div>

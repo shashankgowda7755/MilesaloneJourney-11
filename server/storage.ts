@@ -18,6 +18,8 @@ import {
   type InsertJourneyTracking,
   type TravelPin,
   type InsertTravelPin,
+  type HomePageContent,
+  type InsertHomePageContent,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -71,6 +73,10 @@ export interface IStorage {
   createTravelPin(pin: InsertTravelPin): Promise<TravelPin>;
   updateTravelPin(id: string, pin: Partial<InsertTravelPin>): Promise<TravelPin | undefined>;
   deleteTravelPin(id: string): Promise<boolean>;
+
+  // Home Page Content
+  getHomePageContent(): Promise<HomePageContent | undefined>;
+  updateHomePageContent(content: Partial<InsertHomePageContent>): Promise<HomePageContent>;
 }
 
 export class MemStorage implements IStorage {

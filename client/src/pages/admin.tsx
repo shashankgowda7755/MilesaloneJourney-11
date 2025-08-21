@@ -15,6 +15,7 @@ import DestinationManager from "@/components/admin/destination-manager";
 import TravelPinsManager from "@/components/admin/travel-pins-manager";
 import GalleryManager from "@/components/admin/gallery-manager";
 import MessageManager from "@/components/admin/message-manager";
+import HomeContentManager from "@/components/admin/home-content-manager";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -194,14 +195,19 @@ export default function Admin() {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="dashboard" className="mt-8" data-testid="admin-tabs">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="home-content">Home Page</TabsTrigger>
             <TabsTrigger value="posts">Blog Posts</TabsTrigger>
             <TabsTrigger value="destinations">Destinations</TabsTrigger>
             <TabsTrigger value="travel-pins">Travel Map</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="home-content" className="mt-6">
+            <HomeContentManager />
+          </TabsContent>
 
           <TabsContent value="dashboard" className="mt-6">
             <AdminDashboard 

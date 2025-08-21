@@ -10,6 +10,7 @@ import {
   insertContactMessageSchema,
   insertJourneyTrackingSchema,
   insertTravelPinSchema,
+  insertHomePageContentSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -427,6 +428,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting gallery collection:", error);
       res.status(500).json({ message: "Failed to delete gallery collection" });
+    }
+  });
+
+  // Home Page Content
+  app.get("/api/home-content", async (req, res) => {
+    try {
+      const content = await storage.getHomePageContent();
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching home page content:", error);
+      res.status(500).json({ message: "Failed to fetch home page content" });
+    }
+  });
+
+  app.put("/api/home-content", async (req, res) => {
+    try {
+      const validatedData = insertHomePageContentSchema.partial().parse(req.body);
+      const content = await storage.updateHomePageContent(validatedData);
+      res.json(content);
+    } catch (error) {
+      console.error("Error updating home page content:", error);
+      res.status(500).json({ message: "Failed to update home page content" });
     }
   });
 

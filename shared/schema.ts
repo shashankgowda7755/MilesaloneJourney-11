@@ -158,6 +158,51 @@ export const travelPins = pgTable("travel_pins", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Home page content
+export const homePageContent = pgTable("home_page_content", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Hero section
+  heroTitle: text("hero_title").notNull().default("Raw Roads,\nReal Discovery"),
+  heroSubtitle: text("hero_subtitle").notNull().default("Join Shashank's authentic 4-month journey across India, from Kashmir's valleys to Kanyakumari's shores, on just ₹500 per day"),
+  heroBackgroundImage: text("hero_background_image").notNull().default("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"),
+  exploreButtonText: text("explore_button_text").notNull().default("Explore Journey"),
+  diariesButtonText: text("diaries_button_text").notNull().default("Read Diaries"),
+  dailyBudget: text("daily_budget").notNull().default("₹500"),
+  
+  // Map section
+  mapSectionTitle: text("map_section_title").notNull().default("Live Journey Tracker"),
+  mapSectionDescription: text("map_section_description").notNull().default("Follow the real-time progress from the serene valleys of Kashmir to the southern tip of Kanyakumari. Each pin tells a story of discovery, challenge, and authentic Indian experiences."),
+  
+  // Featured posts section
+  storiesSectionTitle: text("stories_section_title").notNull().default("Latest Travel Stories"),
+  storiesSectionDescription: text("stories_section_description").notNull().default("Authentic stories from the road - the struggles, discoveries, and unexpected connections that make solo travel transformative."),
+  
+  // Guides section  
+  guidesSectionTitle: text("guides_section_title").notNull().default("Travel Guides"),
+  guidesSectionDescription: text("guides_section_description").notNull().default("Comprehensive guides to the most incredible destinations on this journey. From planning to experiencing, get insider tips for authentic travel."),
+  
+  // Gallery section
+  gallerySectionTitle: text("gallery_section_title").notNull().default("Visual Journey"),
+  gallerySectionDescription: text("gallery_section_description").notNull().default("Every photograph tells a story of discovery, challenge, and the incredible diversity of landscapes, cultures, and moments that define authentic India travel."),
+  
+  // Newsletter section
+  newsletterTitle: text("newsletter_title").notNull().default("Join the Journey"),
+  newsletterDescription: text("newsletter_description").notNull().default("Get weekly updates about new destinations, travel stories, and behind-the-scenes insights from the road. No spam, just authentic travel content."),
+  newsletterSubscribersCount: integer("newsletter_subscribers_count").notNull().default(342),
+  weeklyStoriesCount: integer("weekly_stories_count").notNull().default(24),
+  readRate: integer("read_rate").notNull().default(95),
+  
+  // Journey progress cards
+  journeyStartDate: text("journey_start_date").notNull().default("August 1, 2025"),
+  journeyStartLocation: text("journey_start_location").notNull().default("Srinagar, Kashmir"),
+  journeyStartDescription: text("journey_start_description").notNull().default("Dal Lake houseboats and mountain serenity"),
+  finalDestination: text("final_destination").notNull().default("Kanyakumari, Tamil Nadu"),
+  finalDestinationDescription: text("final_destination_description").notNull().default("Land's end where three seas meet"),
+  
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Create insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -218,6 +263,12 @@ export const insertTravelPinSchema = createInsertSchema(travelPins).omit({
   updatedAt: true,
 });
 
+export const insertHomePageContentSchema = createInsertSchema(homePageContent).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -245,6 +296,9 @@ export type JourneyTracking = typeof journeyTracking.$inferSelect;
 
 export type InsertTravelPin = z.infer<typeof insertTravelPinSchema>;
 export type TravelPin = typeof travelPins.$inferSelect;
+
+export type InsertHomePageContent = z.infer<typeof insertHomePageContentSchema>;
+export type HomePageContent = typeof homePageContent.$inferSelect;
 
 // Extended types with relations
 export type GalleryCollectionWithMedia = GalleryCollection & {
