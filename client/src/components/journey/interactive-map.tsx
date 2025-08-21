@@ -81,7 +81,7 @@ export default function InteractiveMap({ height = "500px", showPins = true }: In
               ${pin.rating && pin.rating > 0 ? `
                 <div class="flex items-center space-x-1 mb-2">
                   ${Array.from({ length: 5 }, (_, i) => 
-                    `<span class="text-yellow-400">${i < pin.rating ? '★' : '☆'}</span>`
+                    `<span class="text-yellow-400">${i < (pin.rating || 0) ? '★' : '☆'}</span>`
                   ).join('')}
                   <span class="text-xs text-gray-500">(${pin.rating}/5)</span>
                 </div>

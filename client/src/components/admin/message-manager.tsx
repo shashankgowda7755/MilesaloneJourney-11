@@ -17,9 +17,7 @@ export default function MessageManager() {
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/contact/messages/${id}/read`, {
-        method: 'PATCH',
-      });
+      return apiRequest('PATCH', `/api/contact/messages/${id}/read`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/contact/messages'] });
