@@ -66,7 +66,7 @@ export default function HomeContentManager() {
 
   const updateMutation = useMutation({
     mutationFn: (data: Partial<InsertHomePageContent>) =>
-      apiRequest("/api/home-content", "PUT", data),
+      apiRequest("PUT", "/api/home-content", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/home-content"] });
       toast({
