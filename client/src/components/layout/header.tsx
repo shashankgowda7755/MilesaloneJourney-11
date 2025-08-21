@@ -51,7 +51,7 @@ export default function Header() {
               ))}
               <Link href="/admin">
                 <Button className="bg-brand-orange text-white hover:bg-brand-orange/90" data-testid="admin-button-desktop">
-                  Admin
+                  Login
                 </Button>
               </Link>
             </div>
@@ -110,7 +110,7 @@ export default function Header() {
                     className="w-full bg-brand-orange text-white hover:bg-brand-orange/90"
                     data-testid="admin-button-mobile"
                   >
-                    Admin Login
+                    Login
                   </Button>
                 </Link>
               </nav>
