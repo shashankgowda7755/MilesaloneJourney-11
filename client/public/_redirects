@@ -1,9 +1,0 @@
-# Handle API routes
-/api/* /api/index.js 200
-
-# Handle static assets
-/attached_assets/* /attached_assets/:splat 200
-/assets/* /assets/:splat 200
-
-# SPA fallback - all routes go to index.html
-/* /index.html 200
