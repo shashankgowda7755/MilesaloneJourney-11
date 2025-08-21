@@ -16,7 +16,7 @@ DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 
 # Authentication (REQUIRED)
 SESSION_SECRET=your-secure-session-secret-here
-ADMIN_PASSWORD=your-admin-password
+ADMIN_PASSWORD=Travel@2025
 
 # Environment
 NODE_ENV=production
@@ -109,7 +109,7 @@ git push origin main
 ### 3. Verify Deployment
 Test these URLs after deployment:
 - `https://your-app.vercel.app/` → Homepage loads
-- `https://your-app.vercel.app/admin` → Login form (admin / your-password)
+- `https://your-app.vercel.app/admin` → Login form (admin / Travel@2025)
 - `https://your-app.vercel.app/api/test` → Returns `{"message": "API is working!"}`
 
 ---
@@ -155,7 +155,7 @@ Test these URLs after deployment:
 ### Admin Access
 - **URL**: `https://your-app.vercel.app/admin`
 - **Username**: `admin`
-- **Password**: Your `ADMIN_PASSWORD` environment variable
+- **Password**: Your `ADMIN_PASSWORD` environment variable (default: `Travel@2025`)
 
 ### Content Management
 1. **Blog Posts**: Create travel stories with rich content
