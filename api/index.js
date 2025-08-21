@@ -228,6 +228,15 @@ app.use(session({
   }
 }));
 
+// Authentication middleware
+const requireAuth = (req, res, next) => {
+  if (req.session && req.session.user) {
+    next();
+  } else {
+    res.status(401).json({ message: "Authentication required" });
+  }
+};
+
 // API Routes
 app.get("/api/test", (req, res) => {
   res.json({ message: "API is working!" });
@@ -298,7 +307,7 @@ app.get("/api/blog-posts/by-id/:id", async (req, res) => {
   }
 });
 
-app.post("/api/blog-posts", async (req, res) => {
+app.post("/api/blog-posts", requireAuth, async (req, res) => {
   try {
     await initializeDatabase();
     const [post] = await db.insert(blogPosts).values(req.body).returning();
@@ -306,6 +315,34 @@ app.post("/api/blog-posts", async (req, res) => {
   } catch (error) {
     console.error("Error creating blog post:", error);
     res.status(500).json({ message: "Failed to create blog post" });
+  }
+});
+
+app.put("/api/blog-posts/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    const [post] = await db.update(blogPosts)
+      .set({ ...req.body, updatedAt: new Date() })
+      .where(eq(blogPosts.id, req.params.id))
+      .returning();
+    if (!post) {
+      return res.status(404).json({ message: "Blog post not found" });
+    }
+    res.json(post);
+  } catch (error) {
+    console.error("Error updating blog post:", error);
+    res.status(500).json({ message: "Failed to update blog post" });
+  }
+});
+
+app.delete("/api/blog-posts/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    await db.delete(blogPosts).where(eq(blogPosts.id, req.params.id));
+    res.json({ success: true, message: "Blog post deleted" });
+  } catch (error) {
+    console.error("Error deleting blog post:", error);
+    res.status(500).json({ message: "Failed to delete blog post" });
   }
 });
 
@@ -347,7 +384,7 @@ app.get("/api/destinations/:slug", async (req, res) => {
   }
 });
 
-app.post("/api/destinations", async (req, res) => {
+app.post("/api/destinations", requireAuth, async (req, res) => {
   try {
     await initializeDatabase();
     const [destination] = await db.insert(destinations).values(req.body).returning();
@@ -355,6 +392,34 @@ app.post("/api/destinations", async (req, res) => {
   } catch (error) {
     console.error("Error creating destination:", error);
     res.status(500).json({ message: "Failed to create destination" });
+  }
+});
+
+app.put("/api/destinations/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    const [destination] = await db.update(destinations)
+      .set({ ...req.body, updatedAt: new Date() })
+      .where(eq(destinations.id, req.params.id))
+      .returning();
+    if (!destination) {
+      return res.status(404).json({ message: "Destination not found" });
+    }
+    res.json(destination);
+  } catch (error) {
+    console.error("Error updating destination:", error);
+    res.status(500).json({ message: "Failed to update destination" });
+  }
+});
+
+app.delete("/api/destinations/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    await db.delete(destinations).where(eq(destinations.id, req.params.id));
+    res.json({ success: true, message: "Destination deleted" });
+  } catch (error) {
+    console.error("Error deleting destination:", error);
+    res.status(500).json({ message: "Failed to delete destination" });
   }
 });
 
@@ -393,7 +458,7 @@ app.get("/api/gallery/:id", async (req, res) => {
   }
 });
 
-app.post("/api/gallery", async (req, res) => {
+app.post("/api/gallery", requireAuth, async (req, res) => {
   try {
     await initializeDatabase();
     const [collection] = await db.insert(galleryCollections).values(req.body).returning();
@@ -401,6 +466,34 @@ app.post("/api/gallery", async (req, res) => {
   } catch (error) {
     console.error("Error creating gallery collection:", error);
     res.status(500).json({ message: "Failed to create gallery collection" });
+  }
+});
+
+app.put("/api/gallery/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    const [collection] = await db.update(galleryCollections)
+      .set({ ...req.body, updatedAt: new Date() })
+      .where(eq(galleryCollections.id, req.params.id))
+      .returning();
+    if (!collection) {
+      return res.status(404).json({ message: "Gallery collection not found" });
+    }
+    res.json(collection);
+  } catch (error) {
+    console.error("Error updating gallery collection:", error);
+    res.status(500).json({ message: "Failed to update gallery collection" });
+  }
+});
+
+app.delete("/api/gallery/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    await db.delete(galleryCollections).where(eq(galleryCollections.id, req.params.id));
+    res.json({ success: true, message: "Gallery collection deleted" });
+  } catch (error) {
+    console.error("Error deleting gallery collection:", error);
+    res.status(500).json({ message: "Failed to delete gallery collection" });
   }
 });
 
@@ -418,7 +511,7 @@ app.get("/api/travel-pins", async (req, res) => {
   }
 });
 
-app.post("/api/travel-pins", async (req, res) => {
+app.post("/api/travel-pins", requireAuth, async (req, res) => {
   try {
     await initializeDatabase();
     const [pin] = await db.insert(travelPins).values(req.body).returning();
@@ -426,6 +519,34 @@ app.post("/api/travel-pins", async (req, res) => {
   } catch (error) {
     console.error("Error creating travel pin:", error);
     res.status(500).json({ message: "Failed to create travel pin" });
+  }
+});
+
+app.put("/api/travel-pins/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    const [pin] = await db.update(travelPins)
+      .set({ ...req.body, updatedAt: new Date() })
+      .where(eq(travelPins.id, req.params.id))
+      .returning();
+    if (!pin) {
+      return res.status(404).json({ message: "Travel pin not found" });
+    }
+    res.json(pin);
+  } catch (error) {
+    console.error("Error updating travel pin:", error);
+    res.status(500).json({ message: "Failed to update travel pin" });
+  }
+});
+
+app.delete("/api/travel-pins/:id", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    await db.delete(travelPins).where(eq(travelPins.id, req.params.id));
+    res.json({ success: true, message: "Travel pin deleted" });
+  } catch (error) {
+    console.error("Error deleting travel pin:", error);
+    res.status(500).json({ message: "Failed to delete travel pin" });
   }
 });
 
@@ -455,7 +576,7 @@ app.get("/api/home-content", async (req, res) => {
   }
 });
 
-app.post("/api/home-content", async (req, res) => {
+app.post("/api/home-content", requireAuth, async (req, res) => {
   try {
     await initializeDatabase();
     const [content] = await db.insert(homePageContent).values(req.body).returning();
@@ -463,6 +584,86 @@ app.post("/api/home-content", async (req, res) => {
   } catch (error) {
     console.error("Error creating home page content:", error);
     res.status(500).json({ message: "Failed to create home page content" });
+  }
+});
+
+app.put("/api/home-content", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    const existing = await db.select().from(homePageContent).limit(1);
+    
+    if (existing.length === 0) {
+      const [content] = await db.insert(homePageContent).values({
+        ...req.body,
+        updatedAt: new Date()
+      }).returning();
+      res.json(content);
+    } else {
+      const [content] = await db.update(homePageContent)
+        .set({
+          ...req.body,
+          updatedAt: new Date()
+        })
+        .where(eq(homePageContent.id, existing[0].id))
+        .returning();
+      res.json(content);
+    }
+  } catch (error) {
+    console.error("Error updating home page content:", error);
+    res.status(500).json({ message: "Failed to update home page content" });
+  }
+});
+
+app.put("/api/journey", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    const existing = await db.select().from(journeyTracking).limit(1);
+    
+    if (existing.length === 0) {
+      const [journey] = await db.insert(journeyTracking).values({
+        ...req.body,
+        lastUpdated: new Date()
+      }).returning();
+      res.json(journey);
+    } else {
+      const [journey] = await db.update(journeyTracking)
+        .set({
+          ...req.body,
+          lastUpdated: new Date()
+        })
+        .where(eq(journeyTracking.id, existing[0].id))
+        .returning();
+      res.json(journey);
+    }
+  } catch (error) {
+    console.error("Error updating journey tracking:", error);
+    res.status(500).json({ message: "Failed to update journey tracking" });
+  }
+});
+
+// Admin Stats (Protected)
+app.get("/api/admin/stats", requireAuth, async (req, res) => {
+  try {
+    await initializeDatabase();
+    const posts = await db.select().from(blogPosts);
+    const dests = await db.select().from(destinations);
+    const galleries = await db.select().from(galleryCollections);
+    const pins = await db.select().from(travelPins);
+    
+    res.json({
+      totalPosts: posts.length,
+      totalDestinations: dests.length,
+      totalGalleries: galleries.length,
+      totalPins: pins.length
+    });
+  } catch (error) {
+    console.error("Error fetching admin stats:", error);
+    res.json({
+      totalPosts: 0,
+      totalDestinations: 0,
+      totalGalleries: 0,
+      totalPins: 0
+    });
   }
 });
 
