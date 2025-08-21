@@ -125,13 +125,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/login", (req, res) => {
     const { username, password } = req.body;
-    console.log("Login attempt:", { username, password, expectedUser: "admins", expectedPass: "Travel@2025" });
     
     if (username === "admins" && password === "Travel@2025") {
       req.session.userId = "admin";
       res.json({ success: true, message: "Login successful" });
     } else {
-      console.log("Login failed - Username match:", username === "admins", "Password match:", password === "Travel@2025");
       res.status(401).json({ success: false, message: "Invalid username or password" });
     }
   });
