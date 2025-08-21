@@ -8,16 +8,10 @@ import BlogCard from "@/components/blog/blog-card";
 import NewsletterForm from "@/components/newsletter/newsletter-form";
 import { useJourney } from "@/hooks/use-journey";
 import { useHomeContent } from "@/hooks/use-home-content";
-import { InlineEditor, InlineEditMode } from "@/components/inline-editor";
-import { useState } from "react";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+// Note: Inline editing removed - all editing is now done through admin panel
 import type { BlogPost, Destination, GalleryCollection } from "@shared/schema";
 
 export default function Home() {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const { data: journey } = useJourney();
   const { data: homeContent } = useHomeContent();
@@ -63,33 +57,7 @@ export default function Home() {
     destinations.find(dest => dest.slug === 'kanyakumari-tamil-nadu') || destinations[1]
   ].filter(Boolean);
 
-  // Mutation to update home content
-  const updateContentMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return apiRequest("PUT", "/api/home-content", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/home-content"] });
-      toast({
-        title: "Success",
-        description: "Content updated successfully!",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update content",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleUpdateContent = (field: string, value: string) => {
-    updateContentMutation.mutate({
-      ...homeContent,
-      [field]: value,
-    });
-  };
+  // Note: Content editing is now only available in the admin panel
 
   // Custom selected gallery collections (best ones)
   const customSelectedGallery = [
@@ -99,8 +67,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Edit Mode Toggle */}
-      <InlineEditMode enabled={isEditMode} onToggle={setIsEditMode} />
       
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center" data-testid="hero-section">
@@ -113,49 +79,26 @@ export default function Home() {
         </div>
         
         <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
-          {isEditMode ? (
-            <div className="space-y-4">
-              <InlineEditor
-                content={homeContent?.heroTitle || "Raw Roads,\nReal Discovery"}
-                field="heroTitle"
-                multiline={true}
-                placeholder="Enter hero title (use \n for line breaks)"
-                onSave={(value) => handleUpdateContent("heroTitle", value)}
-                className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-center text-white"
-              />
-              <InlineEditor
-                content={homeContent?.heroSubtitle || "Join Shashank's authentic 4-month journey across India, from Kashmir's valleys to Kanyakumari's shores, on just ₹500 per day"}
-                field="heroSubtitle"
-                multiline={true}
-                placeholder="Enter hero subtitle"
-                onSave={(value) => handleUpdateContent("heroSubtitle", value)}
-                className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto"
-              />
-            </div>
-          ) : (
-            <>
-              <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold mb-6" data-testid="hero-title">
-                {homeContent?.heroTitle?.split('\n').map((line, index) => (
-                  <span key={index}>
-                    {index === 1 ? (
-                      <span className="text-brand-orange">{line}</span>
-                    ) : (
-                      line
-                    )}
-                    {index < (homeContent?.heroTitle?.split('\n').length || 1) - 1 && <br />}
-                  </span>
-                )) || (
-                  <>
-                    Raw Roads,<br />
-                    <span className="text-brand-orange">Real Discovery</span>
-                  </>
+          <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold mb-6" data-testid="hero-title">
+            {homeContent?.heroTitle?.split('\n').map((line, index) => (
+              <span key={index}>
+                {index === 1 ? (
+                  <span className="text-brand-orange">{line}</span>
+                ) : (
+                  line
                 )}
-              </h1>
-              <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto" data-testid="hero-subtitle">
-                {homeContent?.heroSubtitle || "Join Shashank's authentic 4-month journey across India, from Kashmir's valleys to Kanyakumari's shores, on just ₹500 per day"}
-              </p>
-            </>
-          )}
+                {index < (homeContent?.heroTitle?.split('\n').length || 1) - 1 && <br />}
+              </span>
+            )) || (
+              <>
+                Raw Roads,<br />
+                <span className="text-brand-orange">Real Discovery</span>
+              </>
+            )}
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto" data-testid="hero-subtitle">
+            {homeContent?.heroSubtitle || "Join Shashank's authentic 4-month journey across India, from Kashmir's valleys to Kanyakumari's shores, on just ₹500 per day"}
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/journey">
               <Button 
@@ -164,17 +107,7 @@ export default function Home() {
                 data-testid="explore-journey-button"
               >
                 <MapPin className="mr-2 h-5 w-5" />
-                {isEditMode ? (
-                  <InlineEditor
-                    content={homeContent?.exploreButtonText || "Explore Journey"}
-                    field="exploreButtonText"
-                    placeholder="Button text"
-                    onSave={(value) => handleUpdateContent("exploreButtonText", value)}
-                    className="text-white"
-                  />
-                ) : (
-                  homeContent?.exploreButtonText || "Explore Journey"
-                )}
+                {homeContent?.exploreButtonText || "Explore Journey"}
               </Button>
             </Link>
             <Link href="/letters">
@@ -185,17 +118,7 @@ export default function Home() {
                 data-testid="read-diaries-button"
               >
                 <BookOpen className="mr-2 h-5 w-5" />
-                {isEditMode ? (
-                  <InlineEditor
-                    content={homeContent?.diariesButtonText || "Read Diaries"}
-                    field="diariesButtonText"
-                    placeholder="Button text"
-                    onSave={(value) => handleUpdateContent("diariesButtonText", value)}
-                    className="text-white"
-                  />
-                ) : (
-                  homeContent?.diariesButtonText || "Read Diaries"
-                )}
+                {homeContent?.diariesButtonText || "Read Diaries"}
               </Button>
             </Link>
           </div>
@@ -221,18 +144,8 @@ export default function Home() {
               <div className="text-sm lg:text-base text-gray-200">Kilometers</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair">
-                {isEditMode ? (
-                  <InlineEditor
-                    content={homeContent?.dailyBudget || "₹500"}
-                    field="dailyBudget"
-                    placeholder="Daily budget"
-                    onSave={(value) => handleUpdateContent("dailyBudget", value)}
-                    className="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair"
-                  />
-                ) : (
-                  homeContent?.dailyBudget || "₹500"
-                )}
+              <div className="text-3xl lg:text-4xl font-bold text-brand-orange font-playfair" data-testid="stat-budget">
+                {homeContent?.dailyBudget || "₹500"}
               </div>
               <div className="text-sm lg:text-base text-gray-200">Per Day Budget</div>
             </div>
@@ -252,34 +165,12 @@ export default function Home() {
       <section id="journey-map" className="py-16 lg:py-24 bg-white" data-testid="journey-map-section">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            {isEditMode ? (
-              <div className="space-y-4">
-                <InlineEditor
-                  content={homeContent?.mapSectionTitle || "Live Journey Tracker"}
-                  field="mapSectionTitle"
-                  placeholder="Map section title"
-                  onSave={(value) => handleUpdateContent("mapSectionTitle", value)}
-                  className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6"
-                />
-                <InlineEditor
-                  content={homeContent?.mapSectionDescription || "Follow the real-time progress from the serene valleys of Kashmir to the southern tip of Kanyakumari. Each pin tells a story of discovery, challenge, and authentic Indian experiences."}
-                  field="mapSectionDescription"
-                  multiline={true}
-                  placeholder="Map section description"
-                  onSave={(value) => handleUpdateContent("mapSectionDescription", value)}
-                  className="text-xl text-gray-600 max-w-3xl mx-auto"
-                />
-              </div>
-            ) : (
-              <>
-                <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="map-section-title">
-                  {homeContent?.mapSectionTitle || "Live Journey Tracker"}
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="map-section-description">
-                  {homeContent?.mapSectionDescription || "Follow the real-time progress from the serene valleys of Kashmir to the southern tip of Kanyakumari. Each pin tells a story of discovery, challenge, and authentic Indian experiences."}
-                </p>
-              </>
-            )}
+            <h2 className="font-playfair text-3xl lg:text-5xl font-bold text-brand-brown mb-6" data-testid="map-section-title">
+              {homeContent?.mapSectionTitle || "Live Journey Tracker"}
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="map-section-description">
+              {homeContent?.mapSectionDescription || "Follow the real-time progress from the serene valleys of Kashmir to the southern tip of Kanyakumari. Each pin tells a story of discovery, challenge, and authentic Indian experiences."}
+            </p>
           </div>
           
           <div className="bg-gray-100 rounded-2xl p-8 mb-8">
