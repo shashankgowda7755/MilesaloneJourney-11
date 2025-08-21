@@ -124,12 +124,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/login", (req, res) => {
-    const { password } = req.body;
-    if (password === process.env.ADMIN_PASSWORD || password === "Travel@2025") {
+    const { username, password } = req.body;
+    if (username === "admins" && password === "Travel@2025") {
       req.session.userId = "admin";
       res.json({ success: true, message: "Login successful" });
     } else {
-      res.status(401).json({ success: false, message: "Invalid password" });
+      res.status(401).json({ success: false, message: "Invalid username or password" });
     }
   });
 

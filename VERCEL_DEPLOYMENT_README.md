@@ -109,7 +109,7 @@ git push origin main
 ### 3. Verify Deployment
 Test these URLs after deployment:
 - `https://your-app.vercel.app/` → Homepage loads
-- `https://your-app.vercel.app/admin` → Login form (admin / Travel@2025)
+- `https://your-app.vercel.app/admin` → Login form (admins / Travel@2025)
 - `https://your-app.vercel.app/api/test` → Returns `{"message": "API is working!"}`
 
 ---
@@ -154,7 +154,7 @@ Test these URLs after deployment:
 
 ### Admin Access
 - **URL**: `https://your-app.vercel.app/admin`
-- **Username**: `admin`
+- **Username**: `admins`
 - **Password**: Your `ADMIN_PASSWORD` environment variable (default: `Travel@2025`)
 
 ### Content Management

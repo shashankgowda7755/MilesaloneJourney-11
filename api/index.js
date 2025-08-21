@@ -471,7 +471,7 @@ app.post("/api/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    if (username === "admin" && password === (process.env.ADMIN_PASSWORD || "Travel@2025")) {
+    if (username === "admins" && password === (process.env.ADMIN_PASSWORD || "Travel@2025")) {
       req.session = req.session || {};
       req.session.user = {
         id: "admin",
