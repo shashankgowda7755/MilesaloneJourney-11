@@ -37,7 +37,7 @@ export default function GalleryManager() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertGalleryCollection) => {
-      return apiRequest('/api/gallery', 'POST', data);
+      return apiRequest('POST', '/api/gallery', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
@@ -52,7 +52,7 @@ export default function GalleryManager() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: Partial<InsertGalleryCollection> }) => {
-      return apiRequest(`/api/gallery/${id}`, 'PUT', data);
+      return apiRequest('PUT', `/api/gallery/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
@@ -67,7 +67,7 @@ export default function GalleryManager() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/gallery/${id}`, 'DELETE');
+      return apiRequest('DELETE', `/api/gallery/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
@@ -80,7 +80,7 @@ export default function GalleryManager() {
 
   const toggleVisibilityMutation = useMutation({
     mutationFn: async ({ id, isVisible }: { id: string, isVisible: boolean }) => {
-      return apiRequest(`/api/gallery/${id}`, 'PUT', { isVisible: !isVisible });
+      return apiRequest('PUT', `/api/gallery/${id}`, { isVisible: !isVisible });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
@@ -93,7 +93,7 @@ export default function GalleryManager() {
 
   const addMediaMutation = useMutation({
     mutationFn: async (data: InsertGalleryMedia) => {
-      return apiRequest('/api/gallery/media', 'POST', data);
+      return apiRequest('POST', '/api/gallery/media', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });

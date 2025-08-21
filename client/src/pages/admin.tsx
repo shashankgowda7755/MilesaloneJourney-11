@@ -239,7 +239,7 @@ export default function Admin() {
                 tabsTrigger?.click();
                 setTimeout(() => {
                   // Find and click edit button for this specific post
-                  const editButtons = document.querySelectorAll('[data-testid^="edit-post-"]');
+                  const editButtons = document.querySelectorAll('[data-testid^="edit-blog-post-"]');
                   const targetButton = Array.from(editButtons).find(btn => 
                     btn.getAttribute('data-testid')?.includes(post.id)
                   ) as HTMLElement;
@@ -265,7 +265,7 @@ export default function Admin() {
                 tabsTrigger?.click();
                 setTimeout(() => {
                   // Find and click edit button for this specific collection
-                  const editButtons = document.querySelectorAll('[data-testid^="edit-collection-"]');
+                  const editButtons = document.querySelectorAll('[data-testid^="edit-gallery-"]');
                   const targetButton = Array.from(editButtons).find(btn => 
                     btn.getAttribute('data-testid')?.includes(collection.id)
                   ) as HTMLElement;
